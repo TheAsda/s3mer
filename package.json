@@ -4,8 +4,12 @@
   "description": "P2P streaming service",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "concurrently \"cd client && npm run dev\" \"cd server && npm run dev\"",
+    "build": "concurrently \"cd client && npm run build\" \"cd server && npm run build\""
   },
   "author": "Andrey Kiselev",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "concurrently": "^6.2.0"
+  }
 }
