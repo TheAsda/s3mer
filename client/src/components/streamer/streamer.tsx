@@ -65,13 +65,10 @@ export const Streamer = (props: StreamerProps) => {
           };
           socketRef.current.emit('start-stream', req);
           socketRef.current.on('answer', async (res: ConnectStreamResponse) => {
-            // if (answerRef.current < 15) {
-            //   return;
-            // }
-            answerRef.current++;
-            console.log(answerRef.current);
             console.log('Got answer', res.answer);
-            await peerRef.current?.setRemoteDescription(res.answer);
+            await peerRef.current?.setRemoteDescription(
+              new RTCSessionDescription(res.answer)
+            );
           });
         };
         const offer = await peerRef.current!.createOffer();

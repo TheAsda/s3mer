@@ -2,11 +2,11 @@
   "name": "s3mer",
   "version": "0.0.0",
   "description": "P2P streaming service",
-  "main": "index.js",
   "scripts": {
+    "install-deps": "npm install && concurrently \"cd client && npm install\" \"cd server && npm install\"",
     "dev": "concurrently \"cd client && npm run dev\" \"cd server && npm run dev\"",
     "build": "concurrently \"cd client && npm run build\" \"cd server && npm run build\"",
-    "start": "cross-env NODE_ENV=production node build/server/app.js"
+    "start": "cd build/server && npm install && cross-env NODE_ENV=production node app.js"
   },
   "author": "Andrey Kiselev",
   "license": "ISC",
