@@ -1,8 +1,5 @@
-import openSocket from 'socket.io-client';
+import socket from 'socket.io-client';
 
-// @ts-ignore
-const url = import.meta.env.API_URL as string ?? 'http://localhost:9000';
-
-export function getSocket() {
-  return openSocket(url);
+export function createSocket() {
+  return socket('https://95.165.104.170:9000');
 }

@@ -1,13 +1,14 @@
 import axios from 'axios';
 import { RefObject } from 'react';
+import { iceServers } from './iceServers';
 
-function createPeer() {
+const axiosInstance = axios.create({
+  baseURL: undefined,
+});
+
+export function createPeer() {
   const peer = new RTCPeerConnection({
-    iceServers: [
-      {
-        urls: 'stun:stun.stunprotocol.org',
-      },
-    ],
+    iceServers,
   });
   return peer;
 }
@@ -22,7 +23,7 @@ export function createStreamerPeer(streamerId: string) {
       streamerId,
     };
 
-    const { data } = await axios.post('http://localhost:9000/host', payload);
+    const { data } = await axiosInstance.post('/host', payload);
     const desc = new RTCSessionDescription(data.sdp);
     peer.setRemoteDescription(desc).catch((e) => console.log(e));
   };
@@ -47,7 +48,7 @@ export function createViewerPeer(
       streamerId,
     };
 
-    const { data } = await axios.post('http://localhost:9000/join', payload);
+    const { data } = await axiosInstance.post('/join', payload);
     const desc = new RTCSessionDescription(data.sdp);
     peer.setRemoteDescription(desc).catch((e) => console.log(e));
   };
