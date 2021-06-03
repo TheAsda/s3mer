@@ -10,7 +10,7 @@ import { IRoomStorage } from './room-storage';
 interface Room {
   hostId: string;
   viewerIds: string[];
-  offer?: RTCSessionDescription;
+  offer?: string;
 }
 
 export class InmemoryRoomStorage implements IRoomStorage {
@@ -19,7 +19,7 @@ export class InmemoryRoomStorage implements IRoomStorage {
     this.store = {};
   }
 
-  startStream(streamerId: string, offer: RTCSessionDescription): void {
+  startStream(streamerId: string, offer: string): void {
     if (!this.exists(streamerId)) {
       throw new NotHostedError(streamerId);
     }
@@ -47,20 +47,20 @@ export class InmemoryRoomStorage implements IRoomStorage {
     this.store[streamerId] = undefined;
   }
 
-  join(streamerId: string, viewerId: string): RTCSessionDescription {
+  join(streamerId: string, viewerId: string): string | undefined {
     if (!this.exists(streamerId)) {
       throw new NotHostedError(streamerId);
     }
     const room = this.store[streamerId];
-    if (room?.offer === undefined) {
-      throw new StreamNotStartedError(streamerId);
-    }
+    // if (room?.offer === undefined) {
+    //   throw new StreamNotStartedError(streamerId);
+    // }
     const viewers = room!.viewerIds;
     // if (viewers.includes(viewerId)) {
     //   throw new AlreadyJoinedError(viewerId);
     // }
     viewers.push(viewerId);
-    return room.offer;
+    return room?.offer;
   }
 
   leave(streamerId: string, viewerId: string): void {
@@ -81,8 +81,8 @@ export class InmemoryRoomStorage implements IRoomStorage {
     }
     this.store[streamerId]!.offer = undefined;
   }
-  
-  connect(streamerId: string): RTCSessionDescription {
+
+  connect(streamerId: string): string {
     if (!this.exists(streamerId)) {
       throw new NotHostedError(streamerId);
     }

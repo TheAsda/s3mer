@@ -17,12 +17,17 @@ export const Streamer = (props: StreamerProps) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [status, setStatus] = useState<string>();
   const [viewers, setViewers] = useState(0);
-  const peerRef = useRef<RTCPeerConnection>();
-  const socketRef = useRef<Socket>();
-  const answerRef = useRef(0);
+  const peerRef = useRef<RTCPeerConnection>(createPeer());
+  const socketRef = useRef<Socket>(createSocket());
 
   useEffect(() => {
-    socketRef.current = createSocket();
+    peerRef.current.onicecandidate = (e) => {
+      const req = {
+        streamerId: props.streamerId,
+        candidate: e.candidate,
+      };
+      socketRef.current.emit('add-ice-candidate', req);
+    };
     socketRef.current.on('room-hosted', () => {
       setStatus('Room hosted');
     });
@@ -32,10 +37,18 @@ export const Streamer = (props: StreamerProps) => {
     socketRef.current.on('stream-stopped', () => {
       setStatus('Stream stopped');
     });
+    socketRef.current.on('ice-candidate', ({ candidate }) => {
+      peerRef.current.addIceCandidate(candidate);
+    });
+    socketRef.current.on('answer', async (res: ConnectStreamResponse) => {
+      console.log('Got answer', res.answer);
+      await peerRef.current.setRemoteDescription(JSON.parse(res.answer));
+    });
+
     const req: HostRequest = {
       streamerId: props.streamerId,
     };
-    socketRef.current?.emit('host', req);
+    socketRef.current.emit('host', req);
   }, []);
 
   const startStream = () => {
@@ -44,35 +57,25 @@ export const Streamer = (props: StreamerProps) => {
       alert(
         'navigator.mediaDevices.getDisplayMedia not supported on your browser, use the latest version of Chrome'
       );
+      return;
     }
+
     navigator.mediaDevices
       // @ts-ignore
       .getDisplayMedia({ video: true })
       .then(async (stream: MediaStream) => {
         videoRef.current!.srcObject = stream;
-        peerRef.current = createPeer();
-        console.log(stream.getTracks());
         stream
           .getTracks()
-          .forEach((track) => peerRef.current!.addTrack(track, stream));
-        peerRef.current.onicecandidate = (e) => {
-          if (!socketRef.current || !peerRef.current!.localDescription) {
-            return;
-          }
-          const req: StartStreamRequest = {
-            streamerId: props.streamerId,
-            offer: peerRef.current!.localDescription,
-          };
-          socketRef.current.emit('start-stream', req);
-          socketRef.current.on('answer', async (res: ConnectStreamResponse) => {
-            console.log('Got answer', res.answer);
-            await peerRef.current?.setRemoteDescription(
-              new RTCSessionDescription(res.answer)
-            );
-          });
+          .forEach((track) => peerRef.current.addTrack(track, stream));
+
+        const offer = await peerRef.current.createOffer();
+        await peerRef.current.setLocalDescription(offer);
+        const req: StartStreamRequest = {
+          streamerId: props.streamerId,
+          offer: JSON.stringify(offer),
         };
-        const offer = await peerRef.current!.createOffer();
-        await peerRef.current!.setLocalDescription(offer);
+        socketRef.current!.emit('start-stream', req);
       });
   };
 

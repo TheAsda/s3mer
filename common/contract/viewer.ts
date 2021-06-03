@@ -4,7 +4,7 @@ export interface JoinRequest {
 }
 
 export interface JoinResponse {
-  offer: RTCSessionDescription;
+  offer?: string;
 }
 
 export interface ConnectRequest {
@@ -13,14 +13,14 @@ export interface ConnectRequest {
 }
 
 export interface ConnectResponse {
-  offer: RTCSessionDescription;
+  offer?: string;
 }
 
 export interface ConnectStreamRequest {
   streamerId: string;
-  answer: RTCSessionDescription;
+  answer: string;
 }
 
 export interface ConnectStreamResponse {
-  answer: RTCSessionDescription;
+  answer: string;
 }

@@ -4,11 +4,11 @@ export interface HostRequest {
 
 export interface StartStreamRequest {
   streamerId: string;
-  offer: RTCSessionDescription;
+  offer: string;
 }
 
 export interface StartStreamResponse {
-  offer: RTCSessionDescription;
+  offer: string;
 }
 
 export interface StopStreamRequest {

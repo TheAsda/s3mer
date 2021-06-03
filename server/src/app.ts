@@ -36,11 +36,11 @@ const io = new Server(app.server, {
     credentials: true,
   },
 });
-let roomStorage: IRoomStorage;
+// let roomStorage: IRoomStorage;
 
 if (!isDev) {
   console.log('Running in production');
-  roomStorage = new InmemoryRoomStorage();
+  // roomStorage = new InmemoryRoomStorage();
   app.register(fastifyStatic, {
     root: join(__dirname, '..', 'client'),
   });
@@ -53,20 +53,20 @@ if (!isDev) {
 }
 if (isDev) {
   console.log('Running in development');
-  roomStorage = new InmemoryRoomStorage();
+  // roomStorage = new InmemoryRoomStorage();
   app.register(fastifyCors);
 }
 
 io.on('connection', (socket) => {
   socket.on('host', (req: HostRequest) => {
     console.log('Hosting room');
-    roomStorage.create(req.streamerId);
+    // roomStorage.create(req.streamerId);
     socket.join(req.streamerId);
-    socket.emit('room-hosted');
+    socket.to(req.streamerId).emit('room-hosted');
   });
   socket.on('start-stream', (req: StartStreamRequest) => {
     console.log('Starting stream');
-    roomStorage.startStream(req.streamerId, req.offer);
+    // roomStorage.startStream(req.streamerId, req.offer);
     const res: StartStreamResponse = {
       offer: req.offer,
     };
@@ -74,33 +74,41 @@ io.on('connection', (socket) => {
   });
   socket.on('stop-stream', (req: StopStreamRequest) => {
     console.log('Stopping stream');
-    roomStorage.stopStream(req.streamerId);
-    socket.emit('stream-stopped');
+    // roomStorage.stopStream(req.streamerId);
+    socket.to(req.streamerId).emit('stream-stopped');
   });
   socket.on('join', (req: JoinRequest) => {
     console.log('Joining room');
-    const offer = roomStorage.join(req.streamerId, req.viewerId);
-    const response: JoinResponse = {
-      offer,
-    };
+    // const offer = roomStorage.join(req.streamerId, req.viewerId);
     socket.join(req.streamerId);
-    socket.emit('room-joined', response);
+    socket.emit('room-joined');
   });
-  socket.on('connect', (req: ConnectRequest) => {
-    console.log('Connecting room');
-    const offer = roomStorage.join(req.streamerId, req.viewerId);
-    const response: ConnectResponse = {
-      offer,
-    };
-    socket.emit('stream-connected', response);
-  });
-  socket.on('connect-stream', async (req: ConnectStreamRequest) => {
-    console.log('Connecting stream');
+  // socket.on('connect-stream', (req: ConnectRequest) => {
+  //   console.log('Connecting stream');
+  //   // const offer = roomStorage.join(req.streamerId, req.viewerId);
+  //   const response: ConnectResponse = {
+  //     offer: ,
+  //   };
+  //   socket.emit('stream-connected', response);
+  // });
+  socket.on('set-answer', async (req: ConnectStreamRequest) => {
+    console.log('Answer');
     const response: ConnectStreamResponse = {
       answer: req.answer,
     };
     socket.to(req.streamerId).emit('answer', response);
   });
+  socket.on(
+    'add-ice-candidate',
+    async (req: { streamerId: string; candidate: any }) => {
+      console.log('add-ice-candidate', req.candidate);
+      if (!req.candidate) {
+        console.log('empty candidate');
+        return;
+      }
+      socket.to(req.streamerId).emit('ice-candidate', { candidate: req.candidate });
+    }
+  );
 });
 
 app.listen(process.env.PORT ?? 9000, '0.0.0.0', (err, address) =>
