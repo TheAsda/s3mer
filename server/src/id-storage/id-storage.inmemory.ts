@@ -32,7 +32,7 @@ export class InmemoryIdStorage implements IIdStorage {
     return id;
   }
 
-  unset(socketId: string): string {
+  unset(socketId: string): string | null {
     let id: string | null = null;
     this.store = Object.entries(this.store).reduce((acc, cur) => {
       if (cur[1] === socketId) {
@@ -45,9 +45,6 @@ export class InmemoryIdStorage implements IIdStorage {
       acc[cur[0]] = cur[1];
       return acc;
     }, {} as Record<string, string>);
-    if (id === null) {
-      throw new Error('Record with socketId is not set');
-    }
     return id;
   }
 

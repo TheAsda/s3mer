@@ -64,8 +64,16 @@ export const Viewer = (props: ViewerProps) => {
         videoRef.current!.srcObject = e.streams[0];
       };
     };
+    const join = () => {
+      const req: JoinRequest = {
+        streamerId: props.streamerId,
+        viewerId: props.viewerId,
+      };
+      socketRef.current.emit('join', req);
+    };
     const sendAnswer = async () => {
       const answer = await peerRef.current!.createAnswer();
+      peerRef.current?.setLocalDescription(answer);
       const req: AnswerRequest = {
         streamerId: props.streamerId,
         viewerId: props.viewerId,
@@ -78,6 +86,7 @@ export const Viewer = (props: ViewerProps) => {
         throw new Error('Got random response');
       }
       setStatus(Status.Hosted);
+      join();
     });
     socketRef.current.on(SocketEvents.JOIN, (res: JoinRequest) => {
       if (res.streamerId !== props.streamerId) {
@@ -97,6 +106,7 @@ export const Viewer = (props: ViewerProps) => {
         if (res.viewerId !== props.viewerId) {
           throw new Error('Got response for wrong viewer');
         }
+        setStatus(Status.Started);
         peerRef.current!.setRemoteDescription(res.offer);
         sendAnswer();
       }
@@ -109,6 +119,7 @@ export const Viewer = (props: ViewerProps) => {
         }
         setStatus(Status.Stopped);
         videoRef.current!.srcObject = null;
+        initPeer();
       }
     );
     socketRef.current.on(SocketEvents.OFFER, (res: OfferResponse) => {
@@ -149,11 +160,7 @@ export const Viewer = (props: ViewerProps) => {
       initPeer();
     });
     initPeer();
-    const req: JoinRequest = {
-      streamerId: props.streamerId,
-      viewerId: props.viewerId,
-    };
-    socketRef.current.emit('join', req);
+    join();
   }, []);
 
   return (

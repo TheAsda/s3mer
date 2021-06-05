@@ -3,5 +3,5 @@ export interface IIdStorage {
   isStreamer(socketId: string): boolean;
   get(id: string): string;
   getBySocketId(socketId: string): string;
-  unset(socketId: string): string;
+  unset(socketId: string): string | null;
 }

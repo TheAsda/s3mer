@@ -61,9 +61,9 @@ export const Streamer = (props: StreamerProps) => {
       return;
     }
     // @ts-ignore
-    streamRef.current = navigator.mediaDevices.getDisplayMedia({
+    streamRef.current = (await navigator.mediaDevices.getDisplayMedia({
       video: true,
-    }) as MediaStream;
+    })) as MediaStream;
     videoRef.current!.srcObject = streamRef.current;
     const tracks = streamRef.current.getTracks();
 
@@ -127,6 +127,9 @@ export const Streamer = (props: StreamerProps) => {
           throw new Error('Got random response');
         }
         setStatus(Status.Stopped);
+        streamRef.current?.getTracks().forEach((track) => track.stop());
+        streamRef.current = undefined;
+        videoRef.current!.srcObject = null;
       }
     );
     socketRef.current.on(SocketEvents.ANSWER, (res: AnswerResponse) => {
@@ -151,7 +154,8 @@ export const Streamer = (props: StreamerProps) => {
           throw new Error('Got random response');
         }
         const newViewers = res.viewerIds.filter(
-          (viewerId) => !viewers.includes(viewerId)
+          (viewerId) =>
+            !viewers.includes(viewerId) && viewerId !== props.streamerId
         );
         const removedViewers = viewers.filter(
           (viewerId) => !res.viewerIds.includes(viewerId)
@@ -172,8 +176,11 @@ export const Streamer = (props: StreamerProps) => {
             };
             socketRef.current.emit(SocketEvents.ICE_CANDIDATE, req);
           };
-          streamRef
-            .current!.getTracks()
+          if (!streamRef.current) {
+            continue;
+          }
+          streamRef.current
+            .getTracks()
             .forEach((track) => peer.addTrack(track, streamRef.current!));
           const offer = await peer.createOffer();
           await peer.setLocalDescription(offer);
