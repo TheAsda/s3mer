@@ -124,6 +124,7 @@ io.on('connection', (socket) => {
       const socketId = idStorage.get(viewerId);
       const res: StartStreamResponse = {
         streamerId: req.streamerId,
+        viewerId: viewerId,
         offer: offer,
       };
       socket.to(socketId).emit(SocketEvents.START_STREAM, res);

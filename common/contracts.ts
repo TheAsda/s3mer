@@ -24,6 +24,7 @@ export interface StartStreamRequest {
 
 export interface StartStreamResponse {
   streamerId: string;
+  viewerId: string;
   offer: RTCSessionDescriptionInit;
 }
 

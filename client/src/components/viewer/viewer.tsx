@@ -1,13 +1,18 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Socket } from 'socket.io-client';
-import { StartStreamResponse } from '../../../../common/contract/streamer';
 import {
-  ConnectRequest,
-  ConnectResponse,
-  ConnectStreamRequest,
+  AnswerRequest,
+  CloseResponse,
+  HostRequest,
+  IceCandidateRequest,
+  IceCandidateResponse,
   JoinRequest,
-  JoinResponse,
-} from '../../../../common/contract/viewer';
+  OfferResponse,
+  StartStreamResponse,
+  StopStreamResponse,
+  UpdateViewersListResponse,
+} from '../../../../common/contracts';
+import { SocketEvents } from '../../../../common/events';
 import { createSocket } from '../../lib/socket';
 import { createPeer } from '../../lib/webrtc';
 
@@ -16,38 +21,134 @@ export interface ViewerProps {
   viewerId: string;
 }
 
+enum Status {
+  Unknown,
+  Joined,
+  Hosted,
+  Started,
+  Stopped,
+  Disconnected,
+}
+
+const statusMessages: Record<Status, string> = {
+  [Status.Unknown]: 'Unknown',
+  [Status.Joined]: 'Joined',
+  [Status.Hosted]: 'Hosted',
+  [Status.Started]: 'Stream started',
+  [Status.Stopped]: 'Stream stopped',
+  [Status.Disconnected]: 'Host left',
+};
+
 export const Viewer = (props: ViewerProps) => {
-  const [status, setStatus] = useState<string>();
+  const [status, setStatus] = useState<Status>(Status.Unknown);
+  const [viewers, setViewers] = useState<string[]>([]);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const peerRef = useRef<RTCPeerConnection>(createPeer());
+  const peerRef = useRef<RTCPeerConnection>();
   const socketRef = useRef<Socket>(createSocket());
 
   useEffect(() => {
-    peerRef.current.ontrack = (e) => {
-      setStatus('Got track');
-      videoRef.current!.srcObject = e.streams[0];
-    };
-    peerRef.current.onicecandidate = (e) => {
-      const req = {
-        streamerId: props.streamerId,
-        candidate: e.candidate,
+    const initPeer = () => {
+      peerRef.current = createPeer();
+      peerRef.current.onicecandidate = (e) => {
+        if (!e.candidate) {
+          return;
+        }
+        const req: IceCandidateRequest = {
+          senderId: props.viewerId,
+          targetId: props.streamerId,
+          candidate: e.candidate,
+        };
+        socketRef.current.emit(SocketEvents.ICE_CANDIDATE, req);
       };
-      socketRef.current.emit('add-ice-candidate', req);
+      peerRef.current.ontrack = (e) => {
+        videoRef.current!.srcObject = e.streams[0];
+      };
     };
-    socketRef.current.on('stream-started', async (res: StartStreamResponse) => {
-      peerRef.current.setRemoteDescription(JSON.parse(res.offer));
-      peerRef.current.createAnswer();
+    const sendAnswer = async () => {
+      const answer = await peerRef.current!.createAnswer();
+      const req: AnswerRequest = {
+        streamerId: props.streamerId,
+        viewerId: props.viewerId,
+        answer: answer,
+      };
+      socketRef.current.emit(SocketEvents.ANSWER, req);
+    };
+    socketRef.current.on(SocketEvents.HOST, (res: HostRequest) => {
+      if (res.streamerId !== props.streamerId) {
+        throw new Error('Got random response');
+      }
+      setStatus(Status.Hosted);
+    });
+    socketRef.current.on(SocketEvents.JOIN, (res: JoinRequest) => {
+      if (res.streamerId !== props.streamerId) {
+        throw new Error('Got random response');
+      }
+      if (res.viewerId !== props.viewerId) {
+        return;
+      }
+      setStatus(Status.Joined);
     });
     socketRef.current.on(
-      'ice-candidate',
-      (res: { candidate: RTCIceCandidate }) => {
-        peerRef.current.addIceCandidate(res.candidate);
+      SocketEvents.START_STREAM,
+      (res: StartStreamResponse) => {
+        if (res.streamerId !== props.streamerId) {
+          throw new Error('Got random response');
+        }
+        if (res.viewerId !== props.viewerId) {
+          throw new Error('Got response for wrong viewer');
+        }
+        peerRef.current!.setRemoteDescription(res.offer);
+        sendAnswer();
       }
     );
-    socketRef.current.on('room-joined', () => {
-      setStatus('Room joined');
+    socketRef.current.on(
+      SocketEvents.STOP_STREAM,
+      (res: StopStreamResponse) => {
+        if (res.streamerId !== props.streamerId) {
+          throw new Error('Got random response');
+        }
+        setStatus(Status.Stopped);
+        videoRef.current!.srcObject = null;
+      }
+    );
+    socketRef.current.on(SocketEvents.OFFER, (res: OfferResponse) => {
+      if (res.streamerId !== props.streamerId) {
+        throw new Error('Got random response');
+      }
+      if (res.viewerId !== props.viewerId) {
+        throw new Error('Got response for wrong viewer');
+      }
+      peerRef.current!.setRemoteDescription(res.offer);
+      sendAnswer();
     });
-
+    socketRef.current.on(
+      SocketEvents.ICE_CANDIDATE,
+      (res: IceCandidateResponse) => {
+        if (res.targetId !== props.viewerId) {
+          throw new Error('Got random response');
+        }
+        peerRef.current!.addIceCandidate(res.candidate);
+      }
+    );
+    socketRef.current.on(
+      SocketEvents.UPDATE_VIEWERS_LIST,
+      (res: UpdateViewersListResponse) => {
+        if (res.streamerId !== props.streamerId) {
+          throw new Error('Got random response');
+        }
+        setViewers(res.viewerIds);
+      }
+    );
+    socketRef.current.on(SocketEvents.CLOSE, (res: CloseResponse) => {
+      if (res.streamerId !== props.streamerId) {
+        throw new Error('Got random response');
+      }
+      setStatus(Status.Disconnected);
+      videoRef.current!.srcObject = null;
+      setViewers([]);
+      initPeer();
+    });
+    initPeer();
     const req: JoinRequest = {
       streamerId: props.streamerId,
       viewerId: props.viewerId,
@@ -55,23 +156,11 @@ export const Viewer = (props: ViewerProps) => {
     socketRef.current.emit('join', req);
   }, []);
 
-  const connect = async () => {
-    const answer = await peerRef.current.createAnswer();
-    await peerRef.current.setLocalDescription(answer);
-    const req: ConnectStreamRequest = {
-      answer: JSON.stringify(answer),
-      streamerId: props.streamerId,
-    };
-    socketRef.current?.emit('set-answer', req);
-  };
-
   return (
     <div>
       <video autoPlay={true} ref={videoRef} />
-      <button onClick={connect}>Connect</button>
-      <p>{props.streamerId}</p>
-      <p>{props.viewerId}</p>
-      <p>Status: {status}</p>
+      <p>Status: {statusMessages[status]}</p>
+      <p>Viewers: {viewers.join(', ')}</p>
     </div>
   );
 };

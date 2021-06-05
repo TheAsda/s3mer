@@ -8,6 +8,7 @@ import {
   AnswerResponse,
   HostRequest,
   HostResponse,
+  IceCandidateRequest,
   IceCandidateResponse,
   JoinResponse,
   OfferRequest,
@@ -69,6 +70,17 @@ export const Streamer = (props: StreamerProps) => {
     const offers: Record<string, RTCSessionDescriptionInit> = {};
     for (const viewerId of viewers) {
       const peer = createPeer();
+      peer.onicecandidate = (e) => {
+        if (!e.candidate) {
+          return;
+        }
+        const req: IceCandidateRequest = {
+          senderId: props.streamerId,
+          targetId: viewerId,
+          candidate: e.candidate,
+        };
+        socketRef.current.emit(SocketEvents.ICE_CANDIDATE, req);
+      };
       tracks.forEach((track) => peer.addTrack(track, streamRef.current!));
       const offer = await peer.createOffer();
       await peer.setLocalDescription(offer);
@@ -149,6 +161,17 @@ export const Streamer = (props: StreamerProps) => {
         }
         for (const viewerId of newViewers) {
           const peer = createPeer();
+          peer.onicecandidate = (e) => {
+            if (!e.candidate) {
+              return;
+            }
+            const req: IceCandidateRequest = {
+              senderId: props.streamerId,
+              targetId: viewerId,
+              candidate: e.candidate,
+            };
+            socketRef.current.emit(SocketEvents.ICE_CANDIDATE, req);
+          };
           streamRef
             .current!.getTracks()
             .forEach((track) => peer.addTrack(track, streamRef.current!));
