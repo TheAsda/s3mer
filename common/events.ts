@@ -6,7 +6,9 @@ export const SocketEvents = {
   ANSWER: 'answer',
   ICE_CANDIDATE: 'ice-candidate',
   DISCONNECT: 'disconnect',
-  UPDATE_VIEWER_LIST: 'update-viewer-list'
+
+  UPDATE_VIEWERS_LIST: 'update-viewers-list',
+  CLOSE: 'close',
 } as const;
 
 // offer storage or peer hosting on join

@@ -1,22 +1,19 @@
 import React, { useEffect, useRef } from 'react';
 import { useState } from 'react';
 import { createPeer } from '../../lib/webrtc';
-import socket, { Socket } from 'socket.io-client';
-import {
-  HostRequest,
-  StartStreamRequest,
-} from '../../../../common/contract/streamer';
-import { ConnectStreamResponse } from '../../../../common/contract/viewer';
+import { Socket } from 'socket.io-client';
 import { createSocket } from '../../lib/socket';
+import { SocketEvents } from '../../../../common/events';
+import { HostRequest } from '../../../../common/contracts';
 
 export interface StreamerProps {
   streamerId: string;
 }
 
 export const Streamer = (props: StreamerProps) => {
-  const videoRef = useRef<HTMLVideoElement>(null);
   const [status, setStatus] = useState<string>();
   const [viewers, setViewers] = useState(0);
+  const videoRef = useRef<HTMLVideoElement>(null);
   const peerRef = useRef<RTCPeerConnection>(createPeer());
   const socketRef = useRef<Socket>(createSocket());
 
@@ -40,15 +37,15 @@ export const Streamer = (props: StreamerProps) => {
     socketRef.current.on('ice-candidate', ({ candidate }) => {
       peerRef.current.addIceCandidate(candidate);
     });
-    socketRef.current.on('answer', async (res: ConnectStreamResponse) => {
-      console.log('Got answer', res.answer);
-      await peerRef.current.setRemoteDescription(JSON.parse(res.answer));
-    });
+    // socketRef.current.on('answer', async (res: ConnectStreamResponse) => {
+    //   console.log('Got answer', res.answer);
+    //   await peerRef.current.setRemoteDescription(JSON.parse(res.answer));
+    // });
 
     const req: HostRequest = {
       streamerId: props.streamerId,
     };
-    socketRef.current.emit('host', req);
+    socketRef.current.emit(SocketEvents.HOST, req);
   }, []);
 
   const startStream = () => {
@@ -71,11 +68,11 @@ export const Streamer = (props: StreamerProps) => {
 
         const offer = await peerRef.current.createOffer();
         await peerRef.current.setLocalDescription(offer);
-        const req: StartStreamRequest = {
-          streamerId: props.streamerId,
-          offer: JSON.stringify(offer),
-        };
-        socketRef.current!.emit('start-stream', req);
+        // const req: StartStreamRequest = {
+        //   streamerId: props.streamerId,
+        //   offer: JSON.stringify(offer),
+        // };
+        // socketRef.current!.emit('start-stream', req);
       });
   };
 

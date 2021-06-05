@@ -60,6 +60,10 @@ export interface IceCandidateResponse {
   candidate: RTCIceCandidate;
 }
 
-export interface UpdateViewerListResponse {
+export interface UpdateViewersListResponse {
   viewerIds: string[];
+}
+
+export interface CloseResponse {
+  streamerId: string;
 }

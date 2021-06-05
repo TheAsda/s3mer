@@ -4,22 +4,27 @@ import { join } from 'path';
 import fastifyCors from 'fastify-cors';
 import { readFileSync } from 'fs';
 import { Server } from 'socket.io';
-import { IRoomStorage } from './room-storage/room-storage';
-import { InmemoryRoomStorage } from './room-storage/room-storage.inmemory';
+import { IIdStorage } from './id-storage/id-storage';
+import { InmemoryIdStorage } from './id-storage/id-storage.inmemory';
+import { SocketEvents } from '../../common/events';
 import {
+  AnswerRequest,
+  AnswerResponse,
+  CloseResponse,
   HostRequest,
+  HostResponse,
+  IceCandidateRequest,
+  IceCandidateResponse,
+  JoinRequest,
+  JoinResponse,
   StartStreamRequest,
   StartStreamResponse,
   StopStreamRequest,
-} from '../../common/contract/streamer';
-import {
-  ConnectRequest,
-  ConnectResponse,
-  ConnectStreamRequest,
-  ConnectStreamResponse,
-  JoinRequest,
-  JoinResponse,
-} from '../../common/contract/viewer';
+  UpdateViewersListResponse,
+} from '../../common/contracts';
+import winston from 'winston';
+import { IOfferStorage } from './offer-storage/offer-storage';
+import { InmemoryOfferStorage } from './offer-storage/offer-storage.inmemory';
 
 const isDev = process.env.NODE_ENV !== 'production';
 const app = fastify({
@@ -36,11 +41,22 @@ const io = new Server(app.server, {
     credentials: true,
   },
 });
-// let roomStorage: IRoomStorage;
+
+let idStorage: IIdStorage;
+let offerStorage: IOfferStorage;
+const logger = winston.createLogger({
+  transports: [
+    new winston.transports.Console({
+      format: winston.format.simple(),
+    }),
+  ],
+});
 
 if (!isDev) {
   console.log('Running in production');
-  // roomStorage = new InmemoryRoomStorage();
+  // TODO: replace with redis
+  idStorage = new InmemoryIdStorage();
+  offerStorage = new InmemoryOfferStorage();
   app.register(fastifyStatic, {
     root: join(__dirname, '..', 'client'),
   });
@@ -53,62 +69,111 @@ if (!isDev) {
 }
 if (isDev) {
   console.log('Running in development');
-  // roomStorage = new InmemoryRoomStorage();
+  idStorage = new InmemoryIdStorage();
+  offerStorage = new InmemoryOfferStorage();
   app.register(fastifyCors);
 }
 
 io.on('connection', (socket) => {
-  socket.on('host', (req: HostRequest) => {
-    console.log('Hosting room');
-    // roomStorage.create(req.streamerId);
-    socket.join(req.streamerId);
-    socket.to(req.streamerId).emit('room-hosted');
-  });
-  socket.on('start-stream', (req: StartStreamRequest) => {
-    console.log('Starting stream');
-    // roomStorage.startStream(req.streamerId, req.offer);
-    const res: StartStreamResponse = {
-      offer: req.offer,
+  const updateViewersList = (streamerId: string) => {
+    const room = Array.from(io.sockets.adapter.rooms.get(streamerId)!);
+    const res: UpdateViewersListResponse = {
+      viewerIds: room,
     };
-    socket.to(req.streamerId).emit('stream-started', res);
-  });
-  socket.on('stop-stream', (req: StopStreamRequest) => {
-    console.log('Stopping stream');
-    // roomStorage.stopStream(req.streamerId);
-    socket.to(req.streamerId).emit('stream-stopped');
-  });
-  socket.on('join', (req: JoinRequest) => {
-    console.log('Joining room');
-    // const offer = roomStorage.join(req.streamerId, req.viewerId);
+    socket.to(room).emit(SocketEvents.UPDATE_VIEWERS_LIST, res);
+  };
+  const findRoom = (viewerId: string): string => {
+    const rooms = io.sockets.adapter.rooms;
+    for (const [streamerId, room] of rooms.entries()) {
+      if (room.has(viewerId)) {
+        return streamerId;
+      }
+    }
+    throw new Error('Viewer is not in any room');
+  };
+
+  socket.on(SocketEvents.HOST, (req: HostRequest) => {
+    logger.info('Hosting room', { streamerId: req.streamerId });
+    idStorage.set(req.streamerId, socket.id);
     socket.join(req.streamerId);
-    socket.emit('room-joined');
+    const res: HostResponse = {
+      streamerId: req.streamerId,
+    };
+    socket.to(req.streamerId).emit(SocketEvents.HOST, res);
   });
-  // socket.on('connect-stream', (req: ConnectRequest) => {
-  //   console.log('Connecting stream');
-  //   // const offer = roomStorage.join(req.streamerId, req.viewerId);
-  //   const response: ConnectResponse = {
-  //     offer: ,
-  //   };
-  //   socket.emit('stream-connected', response);
-  // });
-  socket.on('set-answer', async (req: ConnectStreamRequest) => {
-    console.log('Answer');
-    const response: ConnectStreamResponse = {
+  socket.on(SocketEvents.JOIN, (req: JoinRequest) => {
+    logger.info('Joining room', { streamerId: req.streamerId });
+    idStorage.set(req.viewerId, socket.id);
+    socket.join(req.streamerId);
+    const res: JoinResponse = {
+      streamerId: req.streamerId,
+      viewerId: req.viewerId,
+      offer: offerStorage.has(req.streamerId)
+        ? offerStorage.get(req.streamerId)
+        : undefined,
+    };
+    socket.emit(SocketEvents.JOIN, res);
+    updateViewersList(req.streamerId);
+  });
+  socket.on(SocketEvents.START_STREAM, (req: StartStreamRequest) => {
+    logger.info('Starting stream', { streamerId: req.streamerId });
+    if (!req.offers[req.streamerId]) {
+      throw new Error('No additional offer');
+    }
+    offerStorage.set(req.streamerId, req.offers[req.streamerId]);
+    for (const [viewerId, offer] of Object.entries(req.offers)) {
+      const socketId = idStorage.get(viewerId);
+      const res: StartStreamResponse = {
+        streamerId: req.streamerId,
+        offer: offer,
+      };
+      socket.to(socketId).emit(SocketEvents.START_STREAM, res);
+    }
+  });
+  socket.on(SocketEvents.STOP_STREAM, (req: StopStreamRequest) => {
+    logger.info('Stopping service', { streamerId: req.streamerId });
+    offerStorage.unset(req.streamerId);
+    const res: StopStreamRequest = {
+      streamerId: req.streamerId,
+    };
+    socket.to(req.streamerId).emit(SocketEvents.STOP_STREAM, res);
+  });
+  socket.on(SocketEvents.ANSWER, (req: AnswerRequest) => {
+    logger.info('Answer', { streamerId: req.streamerId });
+    const socketId = idStorage.get(req.streamerId);
+    const res: AnswerResponse = {
+      streamerId: req.streamerId,
+      viewerId: req.viewerId,
       answer: req.answer,
     };
-    socket.to(req.streamerId).emit('answer', response);
+    socket.to(socketId).emit(SocketEvents.ANSWER, res);
   });
-  socket.on(
-    'add-ice-candidate',
-    async (req: { streamerId: string; candidate: any }) => {
-      console.log('add-ice-candidate', req.candidate);
-      if (!req.candidate) {
-        console.log('empty candidate');
-        return;
-      }
-      socket.to(req.streamerId).emit('ice-candidate', { candidate: req.candidate });
+  socket.on(SocketEvents.ICE_CANDIDATE, (req: IceCandidateRequest) => {
+    logger.info('Ice candidate');
+    const socketId = idStorage.get(req.targetId);
+    const res: IceCandidateResponse = {
+      targetId: req.targetId,
+      senderId: req.senderId,
+      candidate: req.candidate,
+    };
+    socket.to(socketId).emit(SocketEvents.ICE_CANDIDATE, res);
+  });
+  socket.on(SocketEvents.DISCONNECT, async () => {
+    logger.info('Disconnected');
+    const id = idStorage.unset(socket.id);
+    const isStreamer = offerStorage.has(id);
+    if (isStreamer) {
+      offerStorage.unset(id);
+      const res: CloseResponse = {
+        streamerId: id,
+      };
+      socket.to(id).emit(SocketEvents.CLOSE, res);
+    } else {
+      const streamerId = findRoom(id);
+      await socket.leave(streamerId);
+      updateViewersList(streamerId);
     }
-  );
+  });
 });
 
 app.listen(process.env.PORT ?? 9000, '0.0.0.0', (err, address) =>
