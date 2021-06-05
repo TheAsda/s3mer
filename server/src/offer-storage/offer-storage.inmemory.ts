@@ -11,11 +11,22 @@ export class InmemoryOfferStorage implements IOfferStorage {
   }
 
   get(id: string): RTCSessionDescription {
-    if (!this.store[id]) {
+    if (!this.has(id)) {
       throw new Error('Offer for id is not set');
     }
     const offer = this.store[id];
     delete this.store[id];
     return offer;
+  }
+
+  has(id: string): boolean {
+    return this.store[id] !== undefined;
+  }
+
+  unset(id: string): void {
+    if (!this.has(id)) {
+      throw new Error('Offer for id is not set');
+    }
+    delete this.store[id];
   }
 }

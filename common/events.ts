@@ -10,5 +10,3 @@ export const SocketEvents = {
   UPDATE_VIEWERS_LIST: 'update-viewers-list',
   CLOSE: 'close',
 } as const;
-
-// offer storage or peer hosting on join
