@@ -17,6 +17,8 @@ import {
   IceCandidateResponse,
   JoinRequest,
   JoinResponse,
+  OfferRequest,
+  OfferResponse,
   StartStreamRequest,
   StartStreamResponse,
   StopStreamRequest,
@@ -43,7 +45,7 @@ const io = new Server(app.server, {
 });
 
 let idStorage: IIdStorage;
-let offerStorage: IOfferStorage;
+// let offerStorage: IOfferStorage;
 const logger = winston.createLogger({
   transports: [
     new winston.transports.Console({
@@ -56,7 +58,7 @@ if (!isDev) {
   console.log('Running in production');
   // TODO: replace with redis
   idStorage = new InmemoryIdStorage();
-  offerStorage = new InmemoryOfferStorage();
+  // offerStorage = new InmemoryOfferStorage();
   app.register(fastifyStatic, {
     root: join(__dirname, '..', 'client'),
   });
@@ -70,7 +72,7 @@ if (!isDev) {
 if (isDev) {
   console.log('Running in development');
   idStorage = new InmemoryIdStorage();
-  offerStorage = new InmemoryOfferStorage();
+  // offerStorage = new InmemoryOfferStorage();
   app.register(fastifyCors);
 }
 
@@ -78,7 +80,8 @@ io.on('connection', (socket) => {
   const updateViewersList = (streamerId: string) => {
     const room = Array.from(io.sockets.adapter.rooms.get(streamerId)!);
     const res: UpdateViewersListResponse = {
-      viewerIds: room,
+      streamerId: streamerId,
+      viewerIds: room.map((id) => idStorage.getBySocketId(id)),
     };
     socket.to(room).emit(SocketEvents.UPDATE_VIEWERS_LIST, res);
   };
@@ -94,7 +97,7 @@ io.on('connection', (socket) => {
 
   socket.on(SocketEvents.HOST, (req: HostRequest) => {
     logger.info('Hosting room', { streamerId: req.streamerId });
-    idStorage.set(req.streamerId, socket.id);
+    idStorage.set(req.streamerId, socket.id, true);
     socket.join(req.streamerId);
     const res: HostResponse = {
       streamerId: req.streamerId,
@@ -108,9 +111,6 @@ io.on('connection', (socket) => {
     const res: JoinResponse = {
       streamerId: req.streamerId,
       viewerId: req.viewerId,
-      offer: offerStorage.has(req.streamerId)
-        ? offerStorage.get(req.streamerId)
-        : undefined,
     };
     socket.emit(SocketEvents.JOIN, res);
     updateViewersList(req.streamerId);
@@ -120,7 +120,6 @@ io.on('connection', (socket) => {
     if (!req.offers[req.streamerId]) {
       throw new Error('No additional offer');
     }
-    offerStorage.set(req.streamerId, req.offers[req.streamerId]);
     for (const [viewerId, offer] of Object.entries(req.offers)) {
       const socketId = idStorage.get(viewerId);
       const res: StartStreamResponse = {
@@ -132,11 +131,20 @@ io.on('connection', (socket) => {
   });
   socket.on(SocketEvents.STOP_STREAM, (req: StopStreamRequest) => {
     logger.info('Stopping service', { streamerId: req.streamerId });
-    offerStorage.unset(req.streamerId);
     const res: StopStreamRequest = {
       streamerId: req.streamerId,
     };
     socket.to(req.streamerId).emit(SocketEvents.STOP_STREAM, res);
+  });
+  socket.on(SocketEvents.OFFER, (req: OfferRequest) => {
+    logger.info('Offer', { streamerId: req.streamerId });
+    const socketId = idStorage.get(req.viewerId);
+    const res: OfferResponse = {
+      streamerId: req.streamerId,
+      viewerId: req.viewerId,
+      offer: req.offer,
+    };
+    socket.to(socketId).emit(SocketEvents.OFFER, res);
   });
   socket.on(SocketEvents.ANSWER, (req: AnswerRequest) => {
     logger.info('Answer', { streamerId: req.streamerId });
@@ -160,10 +168,9 @@ io.on('connection', (socket) => {
   });
   socket.on(SocketEvents.DISCONNECT, async () => {
     logger.info('Disconnected');
+    const isStreamer = idStorage.isStreamer(socket.id);
     const id = idStorage.unset(socket.id);
-    const isStreamer = offerStorage.has(id);
     if (isStreamer) {
-      offerStorage.unset(id);
       const res: CloseResponse = {
         streamerId: id,
       };

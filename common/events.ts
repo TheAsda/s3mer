@@ -3,6 +3,7 @@ export const SocketEvents = {
   JOIN: 'join',
   START_STREAM: 'start-stream',
   STOP_STREAM: 'stop-stream',
+  OFFER: 'offer',
   ANSWER: 'answer',
   ICE_CANDIDATE: 'ice-candidate',
   DISCONNECT: 'disconnect',

@@ -14,18 +14,17 @@ export interface JoinRequest {
 export interface JoinResponse {
   streamerId: string;
   viewerId: string;
-  offer?: RTCSessionDescription;
 }
 
 export interface StartStreamRequest {
   streamerId: string;
   // key: viewerId, value: offer
-  offers: Record<string, RTCSessionDescription>;
+  offers: Record<string, RTCSessionDescriptionInit>;
 }
 
 export interface StartStreamResponse {
   streamerId: string;
-  offer: RTCSessionDescription;
+  offer: RTCSessionDescriptionInit;
 }
 
 export interface StopStreamRequest {
@@ -36,16 +35,28 @@ export interface StopStreamResponse {
   streamerId: string;
 }
 
+export interface OfferRequest {
+  streamerId: string;
+  viewerId: string;
+  offer: RTCSessionDescriptionInit;
+}
+
+export interface OfferResponse {
+  streamerId: string;
+  viewerId: string;
+  offer: RTCSessionDescriptionInit;
+}
+
 export interface AnswerRequest {
   streamerId: string;
   viewerId: string;
-  answer: RTCSessionDescription;
+  answer: RTCSessionDescriptionInit;
 }
 
 export interface AnswerResponse {
   streamerId: string;
   viewerId: string;
-  answer: RTCSessionDescription;
+  answer: RTCSessionDescriptionInit;
 }
 
 export interface IceCandidateRequest {
@@ -61,6 +72,7 @@ export interface IceCandidateResponse {
 }
 
 export interface UpdateViewersListResponse {
+  streamerId: string;
   viewerIds: string[];
 }
 
