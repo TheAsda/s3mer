@@ -4,9 +4,9 @@ import cx from 'classnames';
 export type ButtonVariantType = 'primary' | 'secondary' | 'accent';
 
 const buttonVariants: Record<ButtonVariantType, string> = {
-  primary: '',
-  secondary: '',
-  accent: '',
+  primary: 'bg-blue-400',
+  secondary: 'bg-gray-400',
+  accent: 'bg-pink-400',
 };
 
 export interface ButtonProps extends ComponentPropsWithoutRef<'button'> {
@@ -14,5 +14,10 @@ export interface ButtonProps extends ComponentPropsWithoutRef<'button'> {
 }
 
 export const Button = ({ variant, ...props }: ButtonProps) => {
-  return <button className={cx(buttonVariants[variant ?? 'primary'],'')}></button>;
+  return (
+    <button
+      {...props}
+      className={cx(buttonVariants[variant ?? 'primary'], 'p-2 rounded-xl', props.className)}
+    />
+  );
 };
