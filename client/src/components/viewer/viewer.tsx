@@ -165,7 +165,7 @@ export const Viewer = (props: ViewerProps) => {
 
   return (
     <div>
-      <video autoPlay={true} ref={videoRef} />
+      <video autoPlay muted playsInline ref={videoRef} />
       <p>Status: {statusMessages[status]}</p>
       <p>Viewers: {viewers.join(', ')}</p>
     </div>
