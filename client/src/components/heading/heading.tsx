@@ -11,15 +11,15 @@ export interface HeadingProps
 export const Heading = ({ level, ...props }: HeadingProps) => {
   switch (level) {
     case 1:
-      return <h1 {...props} className={cx(props.className, 'text-5xl')} />;
+      return <h1 {...props} className={cx(props.className, 'text-5xl text-cello')} />;
     case 2:
-      return <h2 {...props} className={cx(props.className, 'text-4xl')} />;
+      return <h2 {...props} className={cx(props.className, 'text-4xl text-cello')} />;
     case 3:
-      return <h3 {...props} className={cx(props.className, 'text-3xl')} />;
+      return <h3 {...props} className={cx(props.className, 'text-3xl text-cello')} />;
     case 4:
-      return <h4 {...props} className={cx(props.className, 'text-2xl')} />;
+      return <h4 {...props} className={cx(props.className, 'text-2xl text-cello')} />;
     case 5:
-      return <h5 {...props} className={cx(props.className, 'text-xl')} />;
+      return <h5 {...props} className={cx(props.className, 'text-xl text-cello')} />;
 
     default:
       throw new Error('Unknown level');
