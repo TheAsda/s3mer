@@ -9,7 +9,7 @@ import cx from 'classnames';
 export type LinkVariantType = 'inline' | 'button';
 
 const linkVariant: Record<LinkVariantType, string> = {
-  inline: 'underline text-cello',
+  inline: 'underline text-cello dark:text-cello-200',
   button: 'text-gray-200 rounded-md flex gap-1 items-center bg-cello-300 p-2',
 };
 

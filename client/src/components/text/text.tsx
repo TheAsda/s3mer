@@ -19,14 +19,14 @@ export const Text = ({ isSpan, size, ...props }: TextProps) => {
     return (
       <span
         {...props}
-        className={cx(textSize[size ?? 'md'], 'text-cello', props.className)}
+        className={cx(textSize[size ?? 'md'], 'text-cello dark:text-cello-200', props.className)}
       />
     );
   }
   return (
     <p
       {...props}
-      className={cx(textSize[size ?? 'md'], 'text-cello', props.className)}
+      className={cx(textSize[size ?? 'md'], 'text-cello dark:text-cello-200', props.className)}
     />
   );
 };

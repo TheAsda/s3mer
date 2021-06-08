@@ -10,7 +10,7 @@ export default {
 export const Variants = () => {
   const [state, setState] = useState(false);
   return (
-    <div className="flex gap-4 items-center">
+    <div className="flex gap-4 items-center p-4 dark:bg-gray-700">
       <Switch checked={state} onChange={setState} name="Example switch" />
     </div>
   );

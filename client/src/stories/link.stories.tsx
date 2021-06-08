@@ -11,7 +11,7 @@ export default {
 export const Variants = () => {
   return (
     <BrowserRouter>
-      <div className="flex gap-4 items-center">
+      <div className="flex gap-4 items-center p-4 dark:bg-gray-700">
         <Link to={''} variant="inline">
           Inline link
         </Link>

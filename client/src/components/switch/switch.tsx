@@ -12,7 +12,7 @@ export const Switch = (props: SwitchProps) => {
   return (
     <HeadlessSwitch
       className={cx(
-        props.checked ? 'bg-cello-300' : 'bg-gray-200',
+        props.checked ? 'bg-cello-300' : 'bg-gray-200 dark:bg-gray-400',
         'relative inline-flex items-center h-6 rounded-full w-11 focus:ring focus:ring-cello-100 focus:outline-none'
       )}
       checked={props.checked}

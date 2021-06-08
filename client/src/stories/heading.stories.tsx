@@ -9,7 +9,7 @@ export default {
 
 export const Levels = () => {
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 dark:bg-gray-700 p-4">
       <Heading level={1}>First level</Heading>
       <Heading level={2}>Second level</Heading>
       <Heading level={3}>Third level</Heading>

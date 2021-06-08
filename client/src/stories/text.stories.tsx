@@ -9,7 +9,7 @@ export default {
 
 export const Variants = () => {
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 p-4 dark:bg-gray-700">
       <Text>
         Lorem ipsum dolor, sit amet consectetur adipisicing elit. Dolorum saepe
         pariatur minus deleniti natus ut dignissimos fugiat quibusdam facere
@@ -23,7 +23,7 @@ export const Variants = () => {
 
 export const Sizes = () => {
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col p-4 dark:bg-gray-700">
       <Text size="sm">
         Lorem ipsum dolor sit amet, consectetur adipisicing elit. Id, amet?
       </Text>
