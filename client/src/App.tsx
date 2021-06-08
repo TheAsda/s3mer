@@ -8,7 +8,12 @@ import cx from 'classnames';
 function App() {
   const [isDark, setIsDark] = useState(false);
   return (
-    <div className={cx(isDark && 'dark', 'w-full min-h-screen flex flex-col ')}>
+    <div
+      className={cx(
+        isDark && 'dark',
+        'w-full min-h-screen flex flex-col animate-gradient bg-500'
+      )}
+    >
       <Header isDarkMode={isDark} onModeChange={setIsDark} />
       <Switch>
         <Route path="/stream/:streamId">

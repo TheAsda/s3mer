@@ -1,5 +1,5 @@
 module.exports = {
-  purge: ['index.html', 'src/**/*.{ts,tsx}'],
+  purge: ['index.html', 'src/**/*.{ts,tsx,svg}'],
   // mode: 'jit',
   darkMode: 'class', // or 'media' or 'class'
   theme: {
@@ -82,6 +82,28 @@ module.exports = {
           700: '#F60606',
           800: '#C40505',
           900: '#920404',
+        },
+      },
+      animation: {
+        gradient: 'flow 1s ease infinite',
+      },
+      transitionProperty: {
+        fade: 'opacity, transform',
+      },
+      backgroundSize: {
+        500: '500% 500%',
+      },
+      keyframes: {
+        flow: {
+          '0%': {
+            'background-position': '0% 50%',
+          },
+          '50%': {
+            'background-position': '100% 50%',
+          },
+          '100%': {
+            'background-position': '0% 50%',
+          },
         },
       },
     },

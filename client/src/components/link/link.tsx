@@ -40,7 +40,7 @@ export const Link = ({ variant, ...props }: LinkProps) => {
       tabIndex={0}
       className={cx(
         linkVariant[variant ?? 'inline'],
-        'cursor-pointer focus:outline-none focus:ring focus:ring-cello-100',
+        'cursor-pointer focus:outline-none focus:ring focus:ring-cello-200',
         props.className
       )}
     >
