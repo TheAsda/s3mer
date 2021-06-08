@@ -13,16 +13,16 @@ export const Header = (props: HeaderProps) => {
   const visitorId = useVisitorId();
 
   return (
-    <div className="w-full flex justify-end items-center px-2 gap-4 h-8 dark:bg-gray-700">
+    <div className="w-full flex justify-end items-center px-2 gap-4 h-8 bg-gray-100 dark:bg-gray-800">
       <Text className="font-bold">{visitorId}</Text>
       <div className="flex flex-row items-center gap-1">
-        <SunIcon className="h-5 w-5" />
+        <SunIcon className="h-5 w-5 text-bright-sun-600 dark:text-bright-sun-300" />
         <Switch
           name="Dark mode switch"
           checked={props.isDarkMode}
           onChange={props.onModeChange}
         />
-        <MoonIcon className="h-5 w-5" />
+        <MoonIcon className="h-5 w-5 text-gray-500 dark:text-gray-200" />
       </div>
     </div>
   );

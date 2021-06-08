@@ -8,7 +8,7 @@ export const Welcome = () => {
   const visitorId = useVisitorId();
 
   return (
-    <div className="flex-grow flex flex-col items-center justify-center gap-5">
+    <div className="flex-grow flex flex-col items-center justify-center gap-5 dark:bg-gray-700">
       <Heading level={1} className="dark:text-cello-100">S3mer - P2P streaming service</Heading>
       <Link to={`/stream/${visitorId}`} variant="button">
         Start streaming
