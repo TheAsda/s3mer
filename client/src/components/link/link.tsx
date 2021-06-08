@@ -5,8 +5,8 @@ import cx from 'classnames';
 export type LinkVariantType = 'inline' | 'button';
 
 const linkVariant: Record<LinkVariantType, string> = {
-  inline: 'underline',
-  button: 'rounded-md flex gap-1 items-center bg-casper-300 p-2',
+  inline: 'underline text-cello',
+  button: 'text-gray-300 rounded-md flex gap-1 items-center bg-cello-300 p-2',
 };
 
 export interface LinkProps extends ComponentPropsWithoutRef<'a'> {
@@ -15,7 +15,7 @@ export interface LinkProps extends ComponentPropsWithoutRef<'a'> {
 
 export const Link = ({ variant, ...props }: LinkProps) => {
   return (
-    <a {...props} tabIndex={0} className={cx(linkVariant[variant ?? 'inline'], 'text-cello cursor-pointer focus:outline-none focus:ring focus:ring-offset-jelly-bean-400')}>
+    <a {...props} tabIndex={0} className={cx(linkVariant[variant ?? 'inline'], 'cursor-pointer focus:outline-none focus:ring focus:ring-cello-100')}>
       {variant === 'inline' && props.children}
       {variant === 'button' && (
         <>

@@ -66,7 +66,7 @@ export const Button = ({
       className={cx(
         buttonVariants[variant ?? 'secondary'],
         buttonSizes[size ?? 'md'],
-        'p-2 rounded-xl focus:outline-none focus:ring focus:ring-offset-jelly-bean-400 flex items-stretch gap-1',
+        'p-2 rounded-xl focus:outline-none focus:ring focus:ring-cello-100 flex items-stretch gap-1',
         props.className
       )}
     />
