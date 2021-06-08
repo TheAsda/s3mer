@@ -16,7 +16,17 @@ export interface TextProps extends ComponentPropsWithoutRef<'p' | 'span'> {
 
 export const Text = ({ isSpan, size, ...props }: TextProps) => {
   if (isSpan) {
-    return <span {...props} className={cx(textSize[size ?? 'md'], 'text-cello')} />;
+    return (
+      <span
+        {...props}
+        className={cx(textSize[size ?? 'md'], 'text-cello', props.className)}
+      />
+    );
   }
-  return <p {...props} className={cx(textSize[size ?? 'md'], 'text-cello')} />;
+  return (
+    <p
+      {...props}
+      className={cx(textSize[size ?? 'md'], 'text-cello', props.className)}
+    />
+  );
 };

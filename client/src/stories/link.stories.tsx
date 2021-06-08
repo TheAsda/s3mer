@@ -1,6 +1,7 @@
 import React from 'react';
 import { Meta } from '@storybook/react';
 import { Link } from '../components/link/link';
+import { BrowserRouter } from 'react-router-dom';
 
 export default {
   title: 'Link',
@@ -9,9 +10,15 @@ export default {
 
 export const Variants = () => {
   return (
-    <div className="flex gap-4 items-center">
-      <Link variant="inline">Inline link</Link>
-      <Link variant="button">Button link</Link>
-    </div>
+    <BrowserRouter>
+      <div className="flex gap-4 items-center">
+        <Link to={''} variant="inline">
+          Inline link
+        </Link>
+        <Link to={''} variant="button">
+          Button link
+        </Link>
+      </div>
+    </BrowserRouter>
   );
 };
