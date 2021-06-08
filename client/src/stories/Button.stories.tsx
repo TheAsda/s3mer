@@ -11,7 +11,7 @@ export default {
 
 export const Primary = () => {
   return (
-    <div className="flex gap-4">
+    <div className="p-4 flex gap-4 dark:bg-gray-700">
       <Button variant="primary">Primary</Button>
       <Button variant="secondary">Secondary</Button>
       <Button variant="accent">Accent</Button>
@@ -21,7 +21,7 @@ export const Primary = () => {
 
 export const Sizes = () => {
   return (
-    <div className="flex gap-4 items-center">
+    <div className="p-4 flex gap-4 items-center dark:bg-gray-700">
       <Button size="sm">Small</Button>
       <Button size="md">Middle</Button>
       <Button size="lg">Large</Button>
@@ -31,7 +31,7 @@ export const Sizes = () => {
 
 export const IconButton = () => {
   return (
-    <div className="flex gap-4 items-center">
+    <div className="p-4 flex gap-4 items-center dark:bg-gray-700">
       <Button icon={<CogIcon />} />
       <Button leftIcon={<ClipboardIcon />}>Copy to clipboard</Button>
       <Button rightIcon={<ArrowRightIcon />}>Next</Button>

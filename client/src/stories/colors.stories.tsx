@@ -35,7 +35,7 @@ const ColorLine = (props: { title: string; color: string }) => {
 
 export const Colors = () => {
   return (
-    <div className="flex gap-4">
+    <div className="flex gap-4 ">
       <ColorLine title="Gray" color="gray" />
       <ColorLine title="Primary" color="cello" />
       <ColorLine title="Accent" color="gigas" />

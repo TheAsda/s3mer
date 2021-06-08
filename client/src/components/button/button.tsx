@@ -4,8 +4,8 @@ import cx from 'classnames';
 export type ButtonVariantType = 'primary' | 'secondary' | 'accent';
 
 const buttonVariants: Record<ButtonVariantType, string> = {
-  primary: 'text-gray-200 bg-cello-500 hover:bg-cello-400',
-  secondary: 'text-cello border border-cello hover:bg-gray-100',
+  primary: 'text-gray-200 bg-cello-500 hover:bg-cello-400 dark:bg-cello-300 dark:hover:bg-cello-300',
+  secondary: 'text-cello border border-cello hover:bg-gray-100 dark:text-cello-200 dark:border-cello-200',
   accent: 'text-gray-200 bg-gigas-500 hover:bg-gigas-400',
 };
 

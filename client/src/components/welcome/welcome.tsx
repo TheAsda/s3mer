@@ -9,7 +9,7 @@ export const Welcome = () => {
 
   return (
     <div className="flex-grow flex flex-col items-center justify-center gap-5">
-      <Heading level={1}>S3mer - P2P streaming service</Heading>
+      <Heading level={1} className="dark:text-cello-100">S3mer - P2P streaming service</Heading>
       <Link to={`/stream/${visitorId}`} variant="button">
         Start streaming
       </Link>
