@@ -86,14 +86,22 @@ module.exports = {
       },
       animation: {
         gradient: 'flow 1s ease infinite',
-      },
-      transitionProperty: {
-        fade: 'opacity, transform',
+        'fade-in': 'fade-in 0.5s ease forwards',
       },
       backgroundSize: {
         500: '500% 500%',
       },
       keyframes: {
+        'fade-in': {
+          '0%': {
+            opacity: 0,
+            transform: 'translateY(100%)',
+          },
+          '100%': {
+            opacity: 1,
+            transform: 'translateY(0)',
+          },
+        },
         flow: {
           '0%': {
             'background-position': '0% 50%',
