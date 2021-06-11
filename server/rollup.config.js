@@ -7,5 +7,9 @@ export default {
     dir: join(__dirname, '..', 'build', 'server'),
     format: 'cjs',
   },
-  plugins: [typescript()],
+  plugins: [
+    typescript({
+      tsconfig: 'tsconfig.build.json',
+    }),
+  ],
 };
