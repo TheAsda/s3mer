@@ -10,11 +10,17 @@ export const Stream = (props: StreamProps) => {
   const { streamId } = useParams<{ streamId: string }>();
   const visitorId = useVisitorId();
 
-  if (!visitorId) {
-    return <span>Loading</span>;
-  }
-  if (visitorId === streamId) {
-    return <Streamer streamerId={visitorId} />;
-  }
-  return <Viewer streamerId={streamId} viewerId={visitorId} />;
+  return (
+    <div className="flex-grow background flex flex-col items-center justify-center">
+      <div className="w-full lg:w-full lg:max-w-4xl xl:max-w-7xl ">
+        {!visitorId ? (
+          <span>Loading</span>
+        ) : visitorId === streamId ? (
+          <Streamer streamerId={visitorId} />
+        ) : (
+          <Viewer streamerId={streamId} viewerId={visitorId} />
+        )}
+      </div>
+    </div>
+  );
 };

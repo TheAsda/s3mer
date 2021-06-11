@@ -24,3 +24,7 @@ body,
     animation-delay: 0.4s;
   }
 }
+
+.background {
+  @apply bg-gradient-to-r from-cello-100 to-gigas-100 dark:from-cello-500 dark:to-gigas-600;
+}

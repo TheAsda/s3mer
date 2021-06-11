@@ -3,13 +3,12 @@ import { useVisitorId } from '../../lib/useVisitorId';
 import { Heading } from '../heading/heading';
 import { Text } from '../text/text';
 import { Link } from '../link/link';
-import cx from 'classnames';
 
 export const Welcome = () => {
   const visitorId = useVisitorId();
 
   return (
-    <div className="flex-grow flex flex-col items-center justify-center gap-5 dark:bg-gray-700 bg-gradient-to-r from-cello-100 to-gigas-400 bg-500 dark:from-cello-600 dark:to-gigas-400">
+    <div className="flex-grow flex flex-col items-center justify-center gap-5 background">
       <Heading level={1} className="opacity-0 animate-fade-in">
         S3mer - P2P streaming service
       </Heading>

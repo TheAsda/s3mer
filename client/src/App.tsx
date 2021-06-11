@@ -11,7 +11,7 @@ function App() {
     <div
       className={cx(
         isDark && 'dark',
-        'w-full min-h-screen flex flex-col animate-gradient bg-500'
+        'w-full min-h-screen flex flex-col items-stretch'
       )}
     >
       <Header isDarkMode={isDark} onModeChange={setIsDark} />

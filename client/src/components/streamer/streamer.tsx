@@ -18,6 +18,10 @@ import {
   StopStreamResponse,
   UpdateViewersListResponse,
 } from '../../../../common/contracts';
+import { Heading } from '../heading/heading';
+import { Text } from '../text/text';
+import { Button } from '../button/button';
+import { ViewersList } from '../viewers-list/viewers-list';
 
 export interface StreamerProps {
   streamerId: string;
@@ -81,7 +85,10 @@ export const Streamer = (props: StreamerProps) => {
         };
         socketRef.current.emit(SocketEvents.ICE_CANDIDATE, req);
       };
-      tracks.forEach((track) => peer.addTrack(track, streamRef.current!));
+      tracks.forEach((track) => {
+        track.onended = stopStream;
+        peer.addTrack(track, streamRef.current!);
+      });
       const offer = await peer.createOffer();
       await peer.setLocalDescription(offer);
       peerRef.current[viewerId] = peer;
@@ -200,19 +207,37 @@ export const Streamer = (props: StreamerProps) => {
       }
     );
 
-    const req: HostRequest = {
-      streamerId: props.streamerId,
-    };
-    socketRef.current.emit(SocketEvents.HOST, req);
+    host();
   }, []);
 
   return (
-    <div>
-      <video autoPlay={true} ref={videoRef} />
-      <span>Viewers: {viewers.join(', ')}</span>
-      <span>Status: {statusMessages[status]}</span>
-      <button onClick={startStream}>Start streaming</button>
-      <button onClick={stopStream}>Stop streaming</button>
+    <div className="grid grid-cols-4 grid-rows-5 gap-4">
+      <div className="col-span-3 row-span-4 p-2">
+        <div className="aspect-w-16 aspect-h-9">
+          <video
+            autoPlay={true}
+            ref={videoRef}
+            poster="https://i.imgur.com/USDZIKy.png"
+          ></video>
+        </div>
+      </div>
+      <ViewersList
+        streamerId={props.streamerId}
+        viewerId={props.streamerId}
+        viewers={viewers}
+        className="col-start-4 col-span-1 row-start-1 row-span-4"
+      />
+      <div className="flex justify-center col-span-3">
+        <Text size="lg" isSpan>
+          <strong>Status:</strong> {statusMessages[status]}
+        </Text>
+      </div>
+      <div className="flex gap-4 items-start col-span-1 justify-center">
+        <Button variant="primary" onClick={startStream}>
+          Start streaming
+        </Button>
+        <Button onClick={stopStream}>Stop streaming</Button>
+      </div>
     </div>
   );
 };
