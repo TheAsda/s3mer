@@ -184,6 +184,7 @@ io.on('connection', (socket) => {
       });
       return;
     }
+    socket.leave(id);
     if (isStreamer) {
       const res: CloseResponse = {
         streamerId: id,

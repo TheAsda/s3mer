@@ -16,6 +16,7 @@ import { SocketEvents } from '../../../../common/events';
 import { createSocket } from '../../lib/socket';
 import { createPeer } from '../../lib/webrtc';
 import { ViewersList } from '../viewers-list/viewers-list';
+import { Text } from '../text/text';
 
 export interface ViewerProps {
   streamerId: string;
@@ -166,8 +167,16 @@ export const Viewer = (props: ViewerProps) => {
 
   return (
     <div className="grid grid-cols-4 grid-rows-5">
-      <div className="col-span-3 row-span-4 bg-red-500 ">
-        <video autoPlay muted playsInline ref={videoRef} />
+      <div className="col-span-3 row-span-4 p-2">
+        <div className="aspect-w-16 aspect-h-9">
+          <video
+            autoPlay
+            muted
+            playsInline
+            ref={videoRef}
+            poster="https://i.imgur.com/RwdPVxo.png"
+          />
+        </div>
       </div>
       <ViewersList
         streamerId={props.streamerId}
@@ -175,7 +184,11 @@ export const Viewer = (props: ViewerProps) => {
         viewers={viewers}
         className="col-start-4 col-span-1 row-start-1 row-span-4"
       />
-      <p>Status: {statusMessages[status]}</p>
+      <div className="flex justify-center col-span-3">
+        <Text size="lg">
+          <strong>Status:</strong> {statusMessages[status]}
+        </Text>
+      </div>
     </div>
   );
 };

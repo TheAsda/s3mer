@@ -3,9 +3,9 @@ import freeice from 'freeice';
 
 export const iceServers: RTCIceServer[] = [
   ...freeice(),
-  { urls: ['stun:13.69.189.124:3478'] },
+  { urls: ['stun:95.165.104.170:3478'] },
   {
-    urls: ['turn:13.69.189.124:3478'],
+    urls: ['turn:95.165.104.170:3478'],
     username: 'user',
     credential: 'password',
   },

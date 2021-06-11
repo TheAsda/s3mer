@@ -217,7 +217,7 @@ export const Streamer = (props: StreamerProps) => {
           <video
             autoPlay={true}
             ref={videoRef}
-            poster="https://i.imgur.com/USDZIKy.png"
+            poster="https://i.imgur.com/epWXNOD.png"
           ></video>
         </div>
       </div>
