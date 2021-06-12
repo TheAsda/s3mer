@@ -24,4 +24,4 @@ WORKDIR /app
 COPY --from=builder /app/build /app
 
 ENV NODE_ENV=production
-CMD [ "node","build/server/app.js" ]
+CMD [ "node","server/app.js" ]
