@@ -1,9 +1,12 @@
 FROM node:lts as modules
 
 WORKDIR /modules
-COPY package.json .
-COPY client/package.json ./client
-COPY server/package.json ./server
+COPY ./package.json .
+COPY ./package-lock.json .
+COPY ./client/package.json ./client/
+COPY ./client/package-lock.json ./client/
+COPY ./server/package.json ./server/
+COPY ./server/package-lock.json ./server/
 RUN npm run install-deps
 
 FROM node:lts as builder
