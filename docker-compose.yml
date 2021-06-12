@@ -1,0 +1,6 @@
+services:
+  s3mer:
+    container_name: s3mer
+    restart: always
+    image: ghcr.io/theasda/s3mer:${IMAGE_VERSION}
+    
