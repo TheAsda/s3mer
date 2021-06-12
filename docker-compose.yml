@@ -4,4 +4,6 @@ services:
     container_name: s3mer
     restart: always
     image: ghcr.io/theasda/s3mer:${IMAGE_VERSION}
-    
+    volumes: 
+      - /docker/cert.pem:/app/cert.pem
+      - /docker/key.pem:/app/key.pem

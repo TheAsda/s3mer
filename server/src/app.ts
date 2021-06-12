@@ -34,13 +34,18 @@ const app = fastify({
   },
 });
 
-const io = new Server(app.server, {
-  cors: {
-    origin: 'http://localhost:3000',
-    methods: ['GET', 'POST'],
-    credentials: true,
-  },
-});
+const io = new Server(
+  app.server,
+  isDev
+    ? {
+        cors: {
+          origin: 'http://localhost:3000',
+          methods: ['GET', 'POST'],
+          credentials: true,
+        },
+      }
+    : {}
+);
 
 let idStorage: IIdStorage;
 // let offerStorage: IOfferStorage;
