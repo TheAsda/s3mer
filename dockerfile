@@ -16,7 +16,7 @@ WORKDIR /app
 COPY --from=modules /modules .
 COPY . .
 RUN npm run build
-RUN cd build/server && npm install
+RUN cd build/server && npm install --production
 
 FROM node:lts-alpine
 
