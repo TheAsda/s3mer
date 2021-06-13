@@ -10,7 +10,6 @@ import {
   HostResponse,
   IceCandidateRequest,
   IceCandidateResponse,
-  JoinResponse,
   OfferRequest,
   StartStreamRequest,
   StartStreamResponse,
@@ -18,10 +17,11 @@ import {
   StopStreamResponse,
   UpdateViewersListResponse,
 } from '../../../../common/contracts';
-import { Heading } from '../heading/heading';
 import { Text } from '../text/text';
 import { Button } from '../button/button';
 import { ViewersList } from '../viewers-list/viewers-list';
+import { ClipboardCopyIcon } from '@heroicons/react/solid';
+import { write } from 'clipboardy';
 
 export interface StreamerProps {
   streamerId: string;
@@ -50,6 +50,10 @@ export const Streamer = (props: StreamerProps) => {
   const [stream, setStream] = useState<MediaStream | null>(null);
 
   const isStreaming = stream !== null;
+
+  const copyLinkToClipboard = () => {
+    write(window.location.href);
+  };
 
   const host = () => {
     const req: HostRequest = {
@@ -108,7 +112,7 @@ export const Streamer = (props: StreamerProps) => {
     const tracks = (videoRef.current!.srcObject as MediaStream).getTracks();
     tracks.forEach((track) => track.stop());
     videoRef.current!.srcObject = null;
-    setStream(null)
+    setStream(null);
     const req: StopStreamRequest = {
       streamerId: props.streamerId,
     };
@@ -241,7 +245,9 @@ export const Streamer = (props: StreamerProps) => {
         >
           {isStreaming ? 'Stop streaming' : 'Start streaming'}
         </Button>
-        <Button onClick={stopStream}>Copy link</Button>
+        <Button rightIcon={<ClipboardCopyIcon />} onClick={copyLinkToClipboard}>
+          Copy link
+        </Button>
       </div>
     </div>
   );
