@@ -6,10 +6,6 @@ services:
     image: ghcr.io/theasda/s3mer:${IMAGE_VERSION}
     ports:
       - 9000:9000
-    volumes:
-      - /docker/cert.crt:/app/cert.crt
-      - /docker/ca.crt:/app/ca.crt
-      - /docker/private.key:/app/private.key
     labels: 
       - traefik.http.routers.s3mer.rule=Host(`okinazuno.me`)
       - traefik.http.routers.s3mer.tls=true
