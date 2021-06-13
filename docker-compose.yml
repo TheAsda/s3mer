@@ -11,12 +11,8 @@ services:
       - /docker/ca.crt:/app/ca.crt
       - /docker/private.key:/app/private.key
     labels: 
-      - traefik.enable=true
       - traefik.http.routers.s3mer.rule=Host(`okinazuno.me`)
-      - traefik.http.services.s3mer.loadbalancer.server.port=9000
-      - traefik.http.routers.s3mer.service=s3mer
       - traefik.http.routers.s3mer.tls=true
-      - traefik.docker.network=traefik-network
 
 networks:
   default:
