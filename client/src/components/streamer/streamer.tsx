@@ -47,7 +47,9 @@ export const Streamer = (props: StreamerProps) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const peerRef = useRef<Record<string, RTCPeerConnection>>({});
   const socketRef = useRef<Socket>(createSocket());
-  const streamRef = useRef<MediaStream>();
+  const [stream, setStream] = useState<MediaStream | null>(null);
+
+  const isStreaming = stream !== null;
 
   const host = () => {
     const req: HostRequest = {
@@ -65,11 +67,13 @@ export const Streamer = (props: StreamerProps) => {
       return;
     }
     // @ts-ignore
-    streamRef.current = (await navigator.mediaDevices.getDisplayMedia({
+    const stream = (await navigator.mediaDevices.getDisplayMedia({
       video: true,
     })) as MediaStream;
-    videoRef.current!.srcObject = streamRef.current;
-    const tracks = streamRef.current.getTracks();
+    setStream(stream);
+    videoRef.current!.srcObject = stream;
+    const tracks = stream.getTracks();
+    tracks.forEach((track) => (track.onended = stopStream));
 
     const offers: Record<string, RTCSessionDescriptionInit> = {};
     for (const viewerId of viewers) {
@@ -86,8 +90,7 @@ export const Streamer = (props: StreamerProps) => {
         socketRef.current.emit(SocketEvents.ICE_CANDIDATE, req);
       };
       tracks.forEach((track) => {
-        track.onended = stopStream;
-        peer.addTrack(track, streamRef.current!);
+        peer.addTrack(track, stream!);
       });
       const offer = await peer.createOffer();
       await peer.setLocalDescription(offer);
@@ -105,6 +108,7 @@ export const Streamer = (props: StreamerProps) => {
     const tracks = (videoRef.current!.srcObject as MediaStream).getTracks();
     tracks.forEach((track) => track.stop());
     videoRef.current!.srcObject = null;
+    setStream(null)
     const req: StopStreamRequest = {
       streamerId: props.streamerId,
     };
@@ -134,8 +138,8 @@ export const Streamer = (props: StreamerProps) => {
           throw new Error('Got random response');
         }
         setStatus(Status.Stopped);
-        streamRef.current?.getTracks().forEach((track) => track.stop());
-        streamRef.current = undefined;
+        stream?.getTracks().forEach((track) => track.stop());
+        setStream(null);
         videoRef.current!.srcObject = null;
       }
     );
@@ -183,12 +187,10 @@ export const Streamer = (props: StreamerProps) => {
             };
             socketRef.current.emit(SocketEvents.ICE_CANDIDATE, req);
           };
-          if (!streamRef.current) {
+          if (!stream) {
             continue;
           }
-          streamRef.current
-            .getTracks()
-            .forEach((track) => peer.addTrack(track, streamRef.current!));
+          stream.getTracks().forEach((track) => peer.addTrack(track, stream!));
           const offer = await peer.createOffer();
           await peer.setLocalDescription(offer);
           peerRef.current[viewerId] = peer;
@@ -233,10 +235,13 @@ export const Streamer = (props: StreamerProps) => {
         </Text>
       </div>
       <div className="flex gap-4 items-start col-span-1 justify-center">
-        <Button variant="primary" onClick={startStream}>
-          Start streaming
+        <Button
+          variant="primary"
+          onClick={isStreaming ? stopStream : startStream}
+        >
+          {isStreaming ? 'Stop streaming' : 'Start streaming'}
         </Button>
-        <Button onClick={stopStream}>Stop streaming</Button>
+        <Button onClick={stopStream}>Copy link</Button>
       </div>
     </div>
   );
