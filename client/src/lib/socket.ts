@@ -1,5 +1,5 @@
 import socket from 'socket.io-client';
 
 export function createSocket() {
-  return socket('https://95.165.104.170:9000');
+  return socket(import.meta.env.PROD ? '/' : import.meta.env.VITE_API_URL);
 }

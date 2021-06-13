@@ -206,6 +206,8 @@ io.on('connection', (socket) => {
   });
 });
 
-app.listen(process.env.PORT ?? 9000, '0.0.0.0', (err, address) =>
-  console.log(`Fastify listening on ${address}`)
+app.listen(
+  process.env.PORT ?? 9000,
+  isDev ? 'localhost' : '0.0.0.0',
+  (err, address) => console.log(`Fastify listening on ${address}`)
 );
