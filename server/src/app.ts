@@ -67,9 +67,11 @@ if (!isDev) {
     root: join(__dirname, '..', 'client'),
   });
   app.get('/', (request, reply) => {
+    logger.info('Getting index page');
     reply.sendFile('index.html');
   });
   app.get('/stream/:id', (request, reply) => {
+    logger.info('Getting stream page');
     reply.sendFile('index.html');
   });
 }
