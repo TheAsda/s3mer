@@ -28,11 +28,11 @@ import { createLogger, transports, format } from 'winston';
 
 const isDev = process.env.NODE_ENV !== 'production';
 const app = fastify({
-  https: {
-    cert: readFileSync(join(__dirname, '..', 'cert.crt')),
-    ca: readFileSync(join(__dirname, '..', 'ca.crt')),
-    key: readFileSync(join(__dirname, '..', 'private.key')),
-  },
+  // https: {
+  //   cert: readFileSync(join(__dirname, '..', 'cert.crt')),
+  //   ca: readFileSync(join(__dirname, '..', 'ca.crt')),
+  //   key: readFileSync(join(__dirname, '..', 'private.key')),
+  // },
 });
 
 const io = new Server(
