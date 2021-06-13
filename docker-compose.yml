@@ -13,9 +13,6 @@ services:
     labels: 
       - traefik.enable=true
       - traefik.http.routers.s3mer.rule=Host(`okinazuno.me`)
-      - traefik.http.routers.s3mer.tls=true
-      - traefik.http.routers.s3mer.tls.certificates.certFile=/cert.crt
-      - traefik.http.routers.s3mer.tls.certificates.keyFile=/private.key
 
 networks:
   default:
