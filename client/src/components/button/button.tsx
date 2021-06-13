@@ -48,13 +48,13 @@ export const Button = ({
   }
   let children: ReactNode;
   if (icon) {
-    children = <span className={iconSize}>{icon}</span>;
+    children = <span className={cx('self-center',iconSize)}>{icon}</span>;
   } else {
     children = (
       <>
-        {leftIcon && <span className={iconSize}>{leftIcon}</span>}
+        {leftIcon && <span className={cx('self-center',iconSize)}>{leftIcon}</span>}
         {props.children}
-        {rightIcon && <span className={iconSize}>{rightIcon}</span>}
+        {rightIcon && <span className={cx('self-center',iconSize)}>{rightIcon}</span>}
       </>
     );
   }
