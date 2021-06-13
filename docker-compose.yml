@@ -13,7 +13,12 @@ services:
     labels: 
       - traefik.enable=true
       - traefik.http.routers.s3mer.rule=Host(`okinazuno.me`)
-      - traefik.http.routers.s3mer.tls=true
+      - traefik.http.routers.s3mer.entrypoints=https
+
+      - traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https
+      - traefik.http.routers.s3mer-redirs.rule=hostregexp(`{host:.+}`)
+      - traefik.http.routers.s3mer-redirs.entrypoints=http
+      - traefik.http.routers.s3mer-redirs.middlewares=redirect-to-https
 
 networks:
   default:
