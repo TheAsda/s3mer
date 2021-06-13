@@ -29,8 +29,9 @@ import { createLogger, transports, format } from 'winston';
 const isDev = process.env.NODE_ENV !== 'production';
 const app = fastify({
   https: {
-    key: readFileSync(join(__dirname, '..', 'key.pem'), { encoding: 'utf8' }),
-    cert: readFileSync(join(__dirname, '..', 'cert.pem'), { encoding: 'utf8' }),
+    cert: readFileSync(join(__dirname, '..', 'cert.pem'), {
+      encoding: 'utf8',
+    }),
   },
 });
 
