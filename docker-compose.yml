@@ -1,4 +1,4 @@
-version: "3.8"
+version: '3.8'
 services:
   s3mer:
     container_name: s3mer
@@ -6,5 +6,7 @@ services:
     image: ghcr.io/theasda/s3mer:${IMAGE_VERSION}
     ports:
       - 9000:9000
-    volumes: 
-      - /docker/cert.pem:/app/cert.pem
+    volumes:
+      - /docker/cert.crt:/app/cert.crt
+      - /docker/ca.crt:/app/ca.crt
+      - /docker/private.key:/app/private.key
