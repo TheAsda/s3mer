@@ -22,6 +22,7 @@ import { Button } from '../button/button';
 import { ViewersList } from '../viewers-list/viewers-list';
 import { ClipboardCopyIcon } from '@heroicons/react/solid';
 import { write } from 'clipboardy';
+import { useToast } from '../toast/toast';
 
 export interface StreamerProps {
   streamerId: string;
@@ -48,11 +49,14 @@ export const Streamer = (props: StreamerProps) => {
   const peerRef = useRef<Record<string, RTCPeerConnection>>({});
   const socketRef = useRef<Socket>(createSocket());
   const [stream, setStream] = useState<MediaStream | null>(null);
+  const toast = useToast();
 
   const isStreaming = stream !== null;
 
   const copyLinkToClipboard = () => {
-    write(window.location.href);
+    write(window.location.href).then(() => {
+      toast('Copied to clipboard', 'success');
+    });
   };
 
   const host = () => {

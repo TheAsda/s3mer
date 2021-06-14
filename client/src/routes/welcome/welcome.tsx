@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useVisitorId } from '../../lib/useVisitorId';
-import { Heading } from '../heading/heading';
-import { Text } from '../text/text';
-import { Link } from '../link/link';
+import { Heading } from '../../components/heading/heading';
+import { Text } from '../../components/text/text';
+import { Link } from '../../components/link/link';
 
 export const Welcome = () => {
   const visitorId = useVisitorId();

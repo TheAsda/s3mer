@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Route, Switch } from 'react-router-dom';
 import { Header } from './components/header/header';
-import { Stream } from './components/stream/stream';
-import { Welcome } from './components/welcome/welcome';
+import { Stream } from './routes/stream/stream';
+import { Welcome } from './routes/welcome/welcome';
 import cx from 'classnames';
 
 function App() {

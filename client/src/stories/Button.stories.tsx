@@ -1,7 +1,12 @@
 import React from 'react';
 import { Meta } from '@storybook/react';
 import { Button } from '../components/button/button';
-import { ClipboardIcon, ArrowRightIcon, CogIcon } from '@heroicons/react/solid';
+import {
+  ClipboardIcon,
+  ArrowRightIcon,
+  CogIcon,
+  XIcon,
+} from '@heroicons/react/solid';
 
 export default {
   title: 'Button',
@@ -22,6 +27,7 @@ export const Primary = () => {
 export const Sizes = () => {
   return (
     <div className="p-4 flex gap-4 items-center dark:bg-gray-700">
+      <Button size="xs">Extra Small</Button>
       <Button size="sm">Small</Button>
       <Button size="md">Middle</Button>
       <Button size="lg">Large</Button>
@@ -35,6 +41,17 @@ export const IconButton = () => {
       <Button icon={<CogIcon />} />
       <Button leftIcon={<ClipboardIcon />}>Copy to clipboard</Button>
       <Button rightIcon={<ArrowRightIcon />}>Next</Button>
+    </div>
+  );
+};
+
+export const IconButtonSizes = () => {
+  return (
+    <div className="p-4 flex gap-4 items-center dark:bg-gray-700">
+      <Button icon={<XIcon />} size="xs" className="p-1" />
+      <Button icon={<XIcon />} size="sm" />
+      <Button icon={<XIcon />} size="md" />
+      <Button icon={<XIcon />} size="lg" />
     </div>
   );
 };

@@ -12,21 +12,32 @@ const textSize: Record<TextSizeType, string> = {
 export interface TextProps extends ComponentPropsWithoutRef<'p' | 'span'> {
   isSpan?: boolean;
   size?: TextSizeType;
+  disableDark?: boolean;
 }
 
-export const Text = ({ isSpan, size, ...props }: TextProps) => {
+export const Text = ({ isSpan, size, disableDark, ...props }: TextProps) => {
   if (isSpan) {
     return (
       <span
         {...props}
-        className={cx(textSize[size ?? 'md'], 'text-cello dark:text-cello-200', props.className)}
+        className={cx(
+          textSize[size ?? 'md'],
+          'text-cello',
+          !disableDark && 'dark:text-cello-200',
+          props.className
+        )}
       />
     );
   }
   return (
     <p
       {...props}
-      className={cx(textSize[size ?? 'md'], 'text-cello dark:text-cello-200', props.className)}
+      className={cx(
+        textSize[size ?? 'md'],
+        'text-cello',
+        !disableDark && 'dark:text-cello-200',
+        props.className
+      )}
     />
   );
 };
