@@ -17,7 +17,7 @@ const TypeButton = (props: { type: ToastType }) => {
 
 export const Types = () => {
   return (
-    <ToastProvider duration={2000}>
+    <ToastProvider duration={100000}>
       <div className="flex gap-2">
         <TypeButton type="info" />
         <TypeButton type="success" />

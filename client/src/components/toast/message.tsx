@@ -1,4 +1,4 @@
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useRef, useState } from 'react';
 import type { ToastType } from './toast';
 import cx from 'classnames';
 import { Text } from '../text/text';
@@ -12,6 +12,7 @@ import {
 export interface MessageProps {
   message: string;
   type?: ToastType;
+  onRemove: () => void;
 }
 
 const types: Record<ToastType, string> = {
@@ -37,9 +38,12 @@ export const Message = (props: MessageProps) => {
         types[props.type ?? 'info'],
         'rounded-lg p-2 flex gap-2 items-center'
       )}
+      onClick={props.onRemove}
     >
       {icons[props.type ?? 'info']}
-      <Text disableDark size="lg" className="font-semibold">{props.message}</Text>
+      <Text disableDark size="lg" className="font-semibold select-none">
+        {props.message}
+      </Text>
     </div>
   );
 };

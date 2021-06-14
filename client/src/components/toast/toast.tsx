@@ -1,4 +1,3 @@
-import { XIcon } from '@heroicons/react/solid';
 import React, {
   createContext,
   Dispatch,
@@ -7,9 +6,6 @@ import React, {
   useContext,
   useState,
 } from 'react';
-import { Button } from '../button/button';
-import { Text } from '../text/text';
-import { CheckCircleIcon } from '@heroicons/react/outline';
 import { Message } from './message';
 
 const ToastContext = createContext<
@@ -46,9 +42,15 @@ export const ToastProvider = (props: PropsWithChildren<ToastProviderProps>) => {
       >
         {props.children}
       </ToastContext.Provider>
-      <div className="absolute bottom-0 right-0 p-2 flex flex-col gap-2 items-end">
+      <div className="max-h-screen overflow-hidden absolute top-0 right-1/2 -translate-x-1/2 p-2 flex flex-col gap-2">
         {toasts.map((item) => {
-          return <Message message={item.msg} type={item.type} />;
+          return (
+            <Message
+              message={item.msg}
+              type={item.type}
+              onRemove={() => removeToast(item.id)}
+            />
+          );
         })}
       </div>
     </>
