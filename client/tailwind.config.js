@@ -87,6 +87,7 @@ module.exports = {
       animation: {
         gradient: 'flow 1s ease infinite',
         'fade-in': 'fade-in 0.5s ease forwards',
+        'slide-down': 'slide-down 0.5s ease forwards',
       },
       backgroundSize: {
         500: '500% 500%',
@@ -99,6 +100,14 @@ module.exports = {
           },
           '100%': {
             opacity: 1,
+            transform: 'translateY(0)',
+          },
+        },
+        'slide-down': {
+          '0%': {
+            transform: 'translateY(-100%)',
+          },
+          '100%': {
             transform: 'translateY(0)',
           },
         },

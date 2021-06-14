@@ -42,7 +42,7 @@ export const ToastProvider = (props: PropsWithChildren<ToastProviderProps>) => {
       >
         {props.children}
       </ToastContext.Provider>
-      <div className="max-h-screen overflow-hidden absolute top-0 right-1/2 -translate-x-1/2 p-2 flex flex-col gap-2">
+      <div className="max-h-screen overflow-hidden absolute top-0 left-1/2 transform -translate-x-1/2 flex flex-col items-center w-1/3">
         {toasts.map((item) => {
           return (
             <Message

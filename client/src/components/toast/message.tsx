@@ -36,7 +36,7 @@ export const Message = (props: MessageProps) => {
     <div
       className={cx(
         types[props.type ?? 'info'],
-        'rounded-lg p-2 flex gap-2 items-center'
+        'rounded-lg p-2 flex gap-2 items-center animate-slide-down mt-2 max-w-full'
       )}
       onClick={props.onRemove}
     >
