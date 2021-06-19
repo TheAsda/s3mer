@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Route, Switch } from 'react-router-dom';
 import { Header } from './components/header/header';
 import { Stream } from './routes/stream/stream';
 import { Welcome } from './routes/welcome/welcome';
 import cx from 'classnames';
 import { useLocalStorage } from './lib/useLocalStorage';
+import { GithubLink } from './components/github-link/githib-link';
 
 function App() {
   const [isDark, setIsDark] = useLocalStorage('isDark', false);
@@ -24,6 +25,7 @@ function App() {
           <Welcome />
         </Route>
       </Switch>
+      <GithubLink />
     </div>
   );
 }
