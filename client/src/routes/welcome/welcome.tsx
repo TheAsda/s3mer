@@ -8,7 +8,7 @@ export const Welcome = () => {
   const visitorId = useVisitorId();
 
   return (
-    <div className="flex-grow flex flex-col items-center justify-center gap-5 background">
+    <main className="flex-grow flex flex-col items-center justify-center gap-5 background">
       <Heading level={1} className="opacity-0 animate-fade-in">
         S3mer - P2P streaming service
       </Heading>
@@ -27,6 +27,6 @@ export const Welcome = () => {
         Nothing is stored on the server. It works via <strong>WebRTC</strong>{' '}
         technology.
       </Text>
-    </div>
+    </main>
   );
 };

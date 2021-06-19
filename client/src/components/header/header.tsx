@@ -16,14 +16,14 @@ export const Header = (props: HeaderProps) => {
   const location = useLocation();
 
   return (
-    <div className="flex justify-between items-stretch px-2 gap-4 h-8 bg-gray-100 dark:bg-gray-800">
-      <div className="flex items-center">
+    <header className="flex justify-between items-stretch px-2 gap-4 h-8 bg-gray-100 dark:bg-gray-800">
+      <nav className="flex items-center">
         {location.pathname !== '/' && (
           <Link to="/" variant="inline">
             Home
           </Link>
         )}
-      </div>
+      </nav>
       <div className="flex items-center">
         <Text className="font-bold">{visitorId}</Text>
         <div className="flex flex-row items-center gap-1">
@@ -36,6 +36,6 @@ export const Header = (props: HeaderProps) => {
           <MoonIcon className="h-5 w-5 text-gray-500 dark:text-gray-200" />
         </div>
       </div>
-    </div>
+    </header>
   );
 };
