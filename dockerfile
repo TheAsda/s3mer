@@ -18,7 +18,8 @@ WORKDIR /app
 COPY --from=modules /modules .
 COPY . .
 ENV VITE_SENTRY_URL=${SENTRY_URL}
-RUN npm run build
+RUN npm i -g cross-env
+RUN cross-env VITE_SENTRY_URL=${SENTRY_URL} npm run build
 RUN cd build/server && npm install --production
 
 FROM node:lts-alpine
