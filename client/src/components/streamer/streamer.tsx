@@ -113,7 +113,10 @@ export const Streamer = (props: StreamerProps) => {
   };
 
   const stopStream = () => {
-    const tracks = (videoRef.current!.srcObject as MediaStream).getTracks();
+    if (!stream) {
+      return;
+    }
+    const tracks = stream.getTracks();
     tracks.forEach((track) => track.stop());
     videoRef.current!.srcObject = null;
     setStream(null);
@@ -219,6 +222,16 @@ export const Streamer = (props: StreamerProps) => {
 
     host();
   }, []);
+
+  useEffect(() => {
+    return () => {
+      if (!stream) {
+        return;
+      }
+      const tracks = stream.getTracks();
+      tracks.forEach((track) => track.stop());
+    };
+  }, [stream]);
 
   return (
     <div className="grid grid-cols-4 grid-rows-5 gap-4">
