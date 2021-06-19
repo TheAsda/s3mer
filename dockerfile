@@ -25,6 +25,7 @@ FROM node:lts-alpine
 WORKDIR /app
 COPY --from=builder /app/build /app
 
+ARG SENTRY_URL
 ENV NODE_ENV=production
 ENV SENTRY_URL=${SENTRY_URL}
 CMD [ "node","server/app.js" ]
