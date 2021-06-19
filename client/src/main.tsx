@@ -7,7 +7,7 @@ import { init } from '@sentry/react';
 import { Integrations } from '@sentry/tracing';
 
 init({
-  dsn: import.meta.env.SENTRY_URL,
+  dsn: import.meta.env.VITE_SENTRY_URL,
   integrations: [new Integrations.BrowserTracing()],
   tracesSampleRate: 1.0,
 });
