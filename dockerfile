@@ -1,5 +1,3 @@
-ARG SENTRY_URL
-
 FROM node:lts as modules
 
 WORKDIR /modules
@@ -17,7 +15,9 @@ WORKDIR /app
 
 COPY --from=modules /modules .
 COPY . .
-RUN echo "VITE_SENTRY_URL=kekus.pro" > /app/client/.env && npm run build
+ARG SENTRY_URL
+ENV VITE_SENTRY_URL=${SENTRY_URL}
+RUN npm run build
 RUN cd build/server && npm install --production
 
 FROM node:lts-alpine
