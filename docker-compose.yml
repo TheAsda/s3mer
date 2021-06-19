@@ -9,7 +9,7 @@ services:
     labels: 
       - traefik.http.routers.s3mer.rule=Host(`okinazuno.me`)
       - traefik.http.routers.s3mer.tls=true
-      - traefik.http.routers.blog.tls.certresolver=letEncrypt
+      - traefik.http.routers.s3mer.tls.certresolver=letsEncrypt
 
 networks:
   default:
