@@ -10,6 +10,7 @@ import {
   HostResponse,
   IceCandidateRequest,
   IceCandidateResponse,
+  JoinResponse,
   OfferRequest,
   StartStreamRequest,
   StartStreamResponse,
@@ -49,6 +50,8 @@ export const Streamer = (props: StreamerProps) => {
   const peerRef = useRef<Record<string, RTCPeerConnection>>({});
   const socketRef = useRef<Socket>(createSocket());
   const [stream, setStream] = useState<MediaStream | null>(null);
+  const streamRef = useRef(stream);
+  streamRef.current = stream;
   const toast = useToast();
 
   const isStreaming = stream !== null;
@@ -133,6 +136,11 @@ export const Streamer = (props: StreamerProps) => {
       }
       setStatus(Status.Hosted);
     });
+    socketRef.current.on(SocketEvents.JOIN, (res: JoinResponse) => {
+      if (res.streamerId !== props.streamerId) {
+        throw new Error('Got random response');
+      }
+    });
     socketRef.current.on(
       SocketEvents.START_STREAM,
       (res: StartStreamResponse) => {
@@ -149,7 +157,7 @@ export const Streamer = (props: StreamerProps) => {
           throw new Error('Got random response');
         }
         setStatus(Status.Stopped);
-        stream?.getTracks().forEach((track) => track.stop());
+        streamRef.current?.getTracks().forEach((track) => track.stop());
         setStream(null);
         videoRef.current!.srcObject = null;
       }
@@ -186,6 +194,9 @@ export const Streamer = (props: StreamerProps) => {
           delete peerRef.current[viewerId];
         }
         for (const viewerId of newViewers) {
+          if (!streamRef.current) {
+            continue;
+          }
           const peer = createPeer();
           peer.onicecandidate = (e) => {
             if (!e.candidate) {
@@ -198,10 +209,9 @@ export const Streamer = (props: StreamerProps) => {
             };
             socketRef.current.emit(SocketEvents.ICE_CANDIDATE, req);
           };
-          if (!stream) {
-            continue;
-          }
-          stream.getTracks().forEach((track) => peer.addTrack(track, stream!));
+          streamRef.current
+            .getTracks()
+            .forEach((track) => peer.addTrack(track, streamRef.current!));
           const offer = await peer.createOffer();
           await peer.setLocalDescription(offer);
           peerRef.current[viewerId] = peer;
@@ -221,17 +231,11 @@ export const Streamer = (props: StreamerProps) => {
     );
 
     host();
-  }, []);
 
-  useEffect(() => {
     return () => {
-      if (!stream) {
-        return;
-      }
-      const tracks = stream.getTracks();
-      tracks.forEach((track) => track.stop());
+      stopStream();
     };
-  }, [stream]);
+  }, []);
 
   return (
     <div className="grid grid-cols-4 grid-rows-5 gap-4">

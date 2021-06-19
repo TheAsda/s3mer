@@ -30,6 +30,7 @@ export const ViewersList = ({
           .filter((viewer) => viewer !== streamerId)
           .map((viewer, i) => (
             <li
+              key={viewer}
               className={cx(
                 i % 2 === 0 ? 'bg-cello-200' : 'bg-gigas-200',
                 'rounded-md p-1 bg-opacity-25'
