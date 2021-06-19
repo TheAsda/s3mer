@@ -17,7 +17,8 @@ WORKDIR /app
 
 COPY --from=modules /modules .
 COPY . .
-ENV SENTRY_URL=$SENTRY_URL
+ENV VITE_SENTRY_URL=$SENTRY_URL
+RUN echo "$VITE_SENTRY_URL"
 RUN npm run build
 RUN cd build/server && npm install --production
 
