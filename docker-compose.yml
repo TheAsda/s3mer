@@ -7,7 +7,7 @@ services:
     ports:
       - 9000:9000
     labels: 
-      - traefik.http.routers.s3mer.rule=Host(`okinazuno.me`)
+      - traefik.http.routers.s3mer.rule=Host(`s3mer.okinazuno.me`)
       - traefik.http.routers.s3mer.tls=true
       - traefik.http.routers.s3mer.tls.certresolver=letsEncrypt
 
