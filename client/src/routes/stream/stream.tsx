@@ -13,7 +13,7 @@ export const Stream = (props: StreamProps) => {
 
   return (
     <ToastProvider duration={2000}>
-      <div className="flex-grow background flex flex-col items-center justify-center">
+      <main className="flex-grow background flex flex-col items-center justify-center">
         <div className="w-full xl:w-full xl:max-w-7xl ">
           {!visitorId ? (
             <span>Loading</span>
@@ -23,7 +23,7 @@ export const Stream = (props: StreamProps) => {
             <Viewer streamerId={streamId} viewerId={visitorId} />
           )}
         </div>
-      </div>
+      </main>
     </ToastProvider>
   );
 };
