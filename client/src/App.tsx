@@ -6,6 +6,7 @@ import { Welcome } from './routes/welcome/welcome';
 import cx from 'classnames';
 import { useLocalStorage } from './lib/useLocalStorage';
 import { GithubLink } from './components/github-link/githib-link';
+import { withProfiler } from '@sentry/react';
 
 function App() {
   const [isDark, setIsDark] = useLocalStorage('isDark', false);
@@ -30,4 +31,4 @@ function App() {
   );
 }
 
-export default App;
+export default withProfiler(App);
