@@ -1,3 +1,5 @@
+ARG SENTRY_URL
+
 FROM node:lts as modules
 
 WORKDIR /modules
@@ -15,6 +17,7 @@ WORKDIR /app
 
 COPY --from=modules /modules .
 COPY . .
+ENV SENTRY_URL=$SENTRY_URL
 RUN npm run build
 RUN cd build/server && npm install --production
 
@@ -24,4 +27,5 @@ WORKDIR /app
 COPY --from=builder /app/build /app
 
 ENV NODE_ENV=production
+ENV SENTRY_URL=$SENTRY_URL
 CMD [ "node","server/app.js" ]
