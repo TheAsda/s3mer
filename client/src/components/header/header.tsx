@@ -4,6 +4,7 @@ import { useVisitorId } from '../../lib/useVisitorId';
 import { MoonIcon, SunIcon } from '@heroicons/react/solid';
 import { Switch } from '../switch/switch';
 import { Link } from '../link/link';
+import { useLocation } from 'react-router';
 
 export interface HeaderProps {
   isDarkMode: boolean;
@@ -12,13 +13,16 @@ export interface HeaderProps {
 
 export const Header = (props: HeaderProps) => {
   const visitorId = useVisitorId();
+  const location = useLocation();
 
   return (
     <div className="flex justify-between items-stretch px-2 gap-4 h-8 bg-gray-100 dark:bg-gray-800">
       <div className="flex items-center">
-        <Link to="/" variant="inline">
-          Back
-        </Link>
+        {location.pathname !== '/' && (
+          <Link to="/" variant="inline">
+            Home
+          </Link>
+        )}
       </div>
       <div className="flex items-center">
         <Text className="font-bold">{visitorId}</Text>
