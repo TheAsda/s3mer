@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import { useState } from 'react';
 import { createPeer } from '../../lib/webrtc';
 import { Socket } from 'socket.io-client';
@@ -24,6 +24,7 @@ import { ViewersList } from '../viewers-list/viewers-list';
 import { ClipboardCopyIcon } from '@heroicons/react/solid';
 import { write } from 'clipboardy';
 import { useToast } from '../toast/toast';
+import { Heading } from '../heading/heading';
 
 export interface StreamerProps {
   streamerId: string;
@@ -53,6 +54,11 @@ export const Streamer = (props: StreamerProps) => {
   const streamRef = useRef(stream);
   streamRef.current = stream;
   const toast = useToast();
+  const isStreamingSupported = useMemo(
+    // @ts-ignore
+    () => navigator?.mediaDevices?.getDisplayMedia !== undefined,
+    []
+  );
 
   const isStreaming = stream !== null;
 
@@ -70,8 +76,7 @@ export const Streamer = (props: StreamerProps) => {
   };
 
   const startStream = async () => {
-    // @ts-ignore
-    if (!navigator.mediaDevices.getDisplayMedia) {
+    if (!isStreamingSupported) {
       alert(
         'navigator.mediaDevices.getDisplayMedia not supported on your browser, use the latest version of Chrome'
       );
@@ -237,9 +242,19 @@ export const Streamer = (props: StreamerProps) => {
     };
   }, []);
 
+  if (!isStreamingSupported) {
+    return (
+      <div className="flex place-items-center flex-grow">
+        <Heading level={1} className="text-center">
+          Streaming is not supported on your device 😢
+        </Heading>
+      </div>
+    );
+  }
+
   return (
-    <div className="grid grid-cols-4 grid-rows-5 gap-4">
-      <div className="col-span-3 row-span-4 p-2">
+    <div className="flex flex-col flex-grow md:grid md:grid-cols-4 md:grid-rows-5 gap-4">
+      <div className="md:col-span-3 md:row-span-4 p-2">
         <div className="aspect-w-16 aspect-h-9">
           <video
             autoPlay={true}
@@ -248,18 +263,7 @@ export const Streamer = (props: StreamerProps) => {
           />
         </div>
       </div>
-      <ViewersList
-        streamerId={props.streamerId}
-        viewerId={props.streamerId}
-        viewers={viewers}
-        className="col-start-4 col-span-1 row-start-1 row-span-4"
-      />
-      <div className="flex justify-center col-span-3">
-        <Text size="lg" isSpan>
-          <strong>Status:</strong> {statusMessages[status]}
-        </Text>
-      </div>
-      <div className="flex gap-4 items-start col-span-1 justify-center">
+      <div className="flex gap-4 items-start md:col-span-1 justify-center">
         <Button
           variant="primary"
           onClick={isStreaming ? stopStream : startStream}
@@ -269,6 +273,17 @@ export const Streamer = (props: StreamerProps) => {
         <Button rightIcon={<ClipboardCopyIcon />} onClick={copyLinkToClipboard}>
           Copy link
         </Button>
+      </div>
+      <ViewersList
+        streamerId={props.streamerId}
+        viewerId={props.streamerId}
+        viewers={viewers}
+        className="flex-grow md:col-start-4 md:col-span-1 md:row-start-1 md:row-span-4"
+      />
+      <div className="flex justify-center md:col-span-3">
+        <Text size="lg" isSpan>
+          <strong>Status:</strong> {statusMessages[status]}
+        </Text>
       </div>
     </div>
   );

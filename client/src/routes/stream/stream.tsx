@@ -14,7 +14,7 @@ export const Stream = (props: StreamProps) => {
   return (
     <ToastProvider duration={2000}>
       <main className="flex-grow background flex flex-col items-center justify-center">
-        <div className="w-full xl:w-full xl:max-w-7xl ">
+        <div className="w-full flex-grow flex flex-col xl:w-full xl:max-w-7xl ">
           {!visitorId ? (
             <span>Loading</span>
           ) : visitorId === streamId ? (

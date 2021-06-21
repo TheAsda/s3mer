@@ -9,7 +9,7 @@ export const Welcome = () => {
 
   return (
     <main className="flex-grow flex flex-col items-center justify-center gap-5 background">
-      <Heading level={1} className="opacity-0 animate-fade-in">
+      <Heading level={1} className="opacity-0 animate-fade-in text-center">
         S3mer - P2P streaming service
       </Heading>
       <Link

@@ -166,8 +166,8 @@ export const Viewer = (props: ViewerProps) => {
   }, []);
 
   return (
-    <div className="grid grid-cols-4 grid-rows-5">
-      <div className="col-span-3 row-span-4 p-2">
+    <div className="flex flex-col flex-grow md:grid md:grid-cols-4 md:grid-rows-5">
+      <div className="md:col-span-3 md:row-span-4 p-2">
         <div className="aspect-w-16 aspect-h-9">
           <video
             autoPlay
@@ -182,9 +182,9 @@ export const Viewer = (props: ViewerProps) => {
         streamerId={props.streamerId}
         viewerId={props.viewerId}
         viewers={viewers}
-        className="col-start-4 col-span-1 row-start-1 row-span-4"
+        className="flex-grow md:col-start-4 md:col-span-1 md:row-start-1 md:row-span-4"
       />
-      <div className="flex justify-center col-span-3">
+      <div className="flex justify-center md:col-span-3">
         <Text size="lg">
           <strong>Status:</strong> {statusMessages[status]}
         </Text>
