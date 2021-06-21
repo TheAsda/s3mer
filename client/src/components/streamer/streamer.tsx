@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import { useState } from 'react';
 import { createPeer } from '../../lib/webrtc';
 import { Socket } from 'socket.io-client';
@@ -24,6 +24,7 @@ import { ViewersList } from '../viewers-list/viewers-list';
 import { ClipboardCopyIcon } from '@heroicons/react/solid';
 import { write } from 'clipboardy';
 import { useToast } from '../toast/toast';
+import { Heading } from '../heading/heading';
 
 export interface StreamerProps {
   streamerId: string;
@@ -53,6 +54,11 @@ export const Streamer = (props: StreamerProps) => {
   const streamRef = useRef(stream);
   streamRef.current = stream;
   const toast = useToast();
+  const isStreamingSupported = useMemo(
+    // @ts-ignore
+    () => navigator?.mediaDevices?.getDisplayMedia !== undefined,
+    []
+  );
 
   const isStreaming = stream !== null;
 
@@ -70,8 +76,7 @@ export const Streamer = (props: StreamerProps) => {
   };
 
   const startStream = async () => {
-    // @ts-ignore
-    if (!navigator.mediaDevices.getDisplayMedia) {
+    if (!isStreamingSupported) {
       alert(
         'navigator.mediaDevices.getDisplayMedia not supported on your browser, use the latest version of Chrome'
       );
@@ -236,6 +241,16 @@ export const Streamer = (props: StreamerProps) => {
       stopStream();
     };
   }, []);
+
+  if (!isStreamingSupported) {
+    return (
+      <div className="flex place-items-center flex-grow">
+        <Heading level={1} className="text-center">
+          Streaming is not supported on your device 😢
+        </Heading>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col flex-grow md:grid md:grid-cols-4 md:grid-rows-5 gap-4">
